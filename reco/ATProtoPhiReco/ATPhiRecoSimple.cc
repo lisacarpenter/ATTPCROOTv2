@@ -74,10 +74,13 @@ void ATPhiRecoSimple::PhiAnalyze(ATEvent *event,ATProtoEvent *protoevent){
 
 
 			}
-
+			//std::cout <<"Quadrant 1"<<std::endl;
 			PhiCalc(ProtoQuad1,event);
+			//std::cout <<"Quadrant 2"<<std::endl;
 			PhiCalc(ProtoQuad2,event);
-                        PhiCalc(ProtoQuad3,event);
+			//std::cout <<"Quadrant 3"<<std::endl;
+            PhiCalc(ProtoQuad3,event);
+			//std::cout <<"Quadrant 4"<<std::endl;
 			PhiCalc(ProtoQuad4,event);
 
 			/*fQuadArray.push_back(*ProtoQuad1);
@@ -117,9 +120,9 @@ void ATPhiRecoSimple::PhiCalc(ATProtoQuadrant *quadrant,ATEvent *event)
 		if(nHits>1){
 		      //std::cout<<" Number of hits in quadrant  : "<<nHits<<std::endl;
 		       for(Int_t iHit=0; iHit<nHits-1; iHit++){
-
 			  Double_t phi=0.0;
 			  ATHit qhit_f = quadrant->GetHitArray()->at(iHit); //First strip
+				//std::cout<<" i "<<iHit<<"  TimeStamp "<<qhit_f.GetTimeStamp()<<std::endl;
 			  ATHit qhit_s = quadrant->GetHitArray()->at(iHit+1); //Second strip
 			  Int_t PadNum_qf = qhit_f.GetHitPadNum();
 			  Int_t PadNum_qs = qhit_s.GetHitPadNum();
