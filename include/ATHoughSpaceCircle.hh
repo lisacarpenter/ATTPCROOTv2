@@ -33,10 +33,11 @@ class ATHoughSpaceCircle : public ATHoughSpace{
         std::vector<Double_t>* GetTheta()  {return fTheta;}
         std::vector<Double_t>* GetDl()  {return fDl;}
 
-        Double_t GetIniPhi() {return fIniPhi;}
-        Double_t GetIniTheta()  {return fIniTheta;}
-        Double_t GetIniRadius()  {return fIniRadius;}
-        ATHit* GetIniHit()   {return fIniHit;}
+        Double_t GetIniPhi()                {return fIniPhi;}
+        Double_t GetIniTheta()              {return fIniTheta;}
+        Double_t GetIniRadius()             {return fIniRadius;}
+        ATHit*   GetIniHit()                {return fIniHit;}
+        Double_t* GetInitialParameters()    {return fParameter;}
 
         std::vector<Double_t> GetPosXMin() {return fPosXmin;}
         std::vector<Double_t> GetPosYMin() {return fPosYmin;}
@@ -47,6 +48,9 @@ class ATHoughSpaceCircle : public ATHoughSpace{
         std::vector<Double_t> GetPosXInt() {return fPosXinter;}
         std::vector<Double_t> GetPosYInt() {return fPosYinter;}
         std::vector<Double_t> GetPosZInt() {return fPosZinter;}
+        std::vector<Double_t> GetPosXBack() {return fPosXBack;}
+        std::vector<Double_t> GetPosYBack() {return fPosYBack;}
+        std::vector<Double_t> GetPosZBack() {return fPosZBack;}
 
 
 
@@ -64,6 +68,11 @@ class ATHoughSpaceCircle : public ATHoughSpace{
           Double_t sBMin;
           Double_t sPhiMin;
           Double_t sChi2Min;
+          TVector3 sVertexPos;
+    			Double_t sVertexEner;
+          Double_t sMinDistAppr;
+          Int_t    sNumMCPoint;
+          Double_t sNormChi2;
 
         };
 
@@ -109,12 +118,17 @@ class ATHoughSpaceCircle : public ATHoughSpace{
         std::vector<Double_t> fPosXinter;
         std::vector<Double_t> fPosYinter;
         std::vector<Double_t> fPosZinter;
+        std::vector<Double_t> fPosXBack;
+        std::vector<Double_t> fPosYBack;
+        std::vector<Double_t> fPosZBack;
 
 
 
         std::map<ULong64_t,Int_t> HoughMap; //8 byte for the key, unsigned, no negative distance in Linear Hough space is expected for each quadrant (Radius and Z are the vairbales)
         std::vector<ULong64_t> HoughMapKey;
         std::pair<Double_t,Double_t> fHoughLinePar;
+
+        Double_t fParameter[8];
 
         struct maxpersecond
         {

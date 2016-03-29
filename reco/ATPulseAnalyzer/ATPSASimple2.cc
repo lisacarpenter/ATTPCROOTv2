@@ -40,7 +40,7 @@ ATPSASimple2::Analyze(ATRawEvent *rawEvent, ATEvent *event)
 
 
   Int_t iPad=0;
-  //#pragma omp parallel for ordered schedule(dynamic,1) private(iPad)
+  #pragma omp parallel for ordered schedule(dynamic,1) private(iPad)
   for (iPad = 0; iPad < numPads; iPad++) {
 
 
@@ -142,7 +142,7 @@ ATPSASimple2::Analyze(ATRawEvent *rawEvent, ATEvent *event)
            basecorr+=floatADC[maxAdcIdx-8-i];
            if(i<5){
              slope = (floatADC[maxAdcIdx-i] - floatADC[maxAdcIdx-i-1]); //Derivate for 5 Timebuckets
-             if(slope<0 && floatADC[maxAdcIdx]<3000) fValidDerivative = kFALSE; //3000 condition to avoid killing saturated pads
+             if(slope<0 && floatADC[maxAdcIdx]<3000 && fIsBaseCorr) fValidDerivative = kFALSE; //3000 condition to avoid killing saturated pads
            }
 
 

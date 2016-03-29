@@ -614,6 +614,9 @@ ATEventDrawTask::DrawHSpace()
    fMC_XY_int->Set(0);
    fMC_ZX_int->Set(0);
    fMC_ZY_int->Set(0);
+   fMC_XY_back->Set(0);
+   fMC_ZX_back->Set(0);
+   fMC_ZY_back->Set(0);
    if(fEventManager->GetDrawHoughSpace()){
          if(fIsCircularHough){
                   fHoughSpace = fHoughSpaceCircle_buff->GetHoughSpace("XY");
@@ -652,6 +655,10 @@ ATEventDrawTask::DrawHSpace()
                     std::vector<Double_t> fPosYInt = fHoughSpaceCircle_buff->GetPosYInt();
                     std::vector<Double_t> fPosZInt = fHoughSpaceCircle_buff->GetPosZInt();
 
+                    std::vector<Double_t> fPosXBack = fHoughSpaceCircle_buff->GetPosXBack();
+                    std::vector<Double_t> fPosYBack = fHoughSpaceCircle_buff->GetPosYBack();
+                    std::vector<Double_t> fPosZBack = fHoughSpaceCircle_buff->GetPosZBack();
+
 
                    for(Int_t i=0;i<fPosXMin.size();i++){
                        fMC_XY->SetPoint(fMC_XY->GetN(),fPosXMin.at(i),fPosYMin.at(i));
@@ -672,6 +679,14 @@ ATEventDrawTask::DrawHSpace()
 
                     }
 
+                    for(Int_t i=0;i<fPosXBack.size();i++){
+                           fMC_XY_back->SetPoint(fMC_XY_back->GetN(),fPosXBack.at(i),fPosYBack.at(i));
+                           fMC_ZX_back->SetPoint(fMC_ZX_back->GetN(),fPosZBack.at(i),fPosXBack.at(i));
+                           fMC_ZY_back->SetPoint(fMC_ZY_back->GetN(),fPosZBack.at(i),fPosYBack.at(i));
+
+                    }
+
+
 
                     std::cout<<cYELLOW<<"  = Initial conditions for MC : "<<std::endl;
                     std::cout<<"  Theta          : "<<fHoughSpaceCircle_buff->GetIniTheta()*180/TMath::Pi()<<std::endl;
@@ -685,7 +700,8 @@ ATEventDrawTask::DrawHSpace()
                     std::cout<<"  Phi            : "<<fHoughSpaceCircle_buff->FitParameters.sPhiMin*180/TMath::Pi()<<std::endl;
                     std::cout<<"  Energy         : "<<fHoughSpaceCircle_buff->FitParameters.sEnerMin<<std::endl;
                     std::cout<<"  Brho           : "<<fHoughSpaceCircle_buff->FitParameters.sBrhoMin<<std::endl;
-                    std::cout<<"  Magnetic field : "<<fHoughSpaceCircle_buff->FitParameters.sBMin<<cNORMAL<<std::endl;
+                    std::cout<<"  Magnetic field : "<<fHoughSpaceCircle_buff->FitParameters.sBMin<<std::endl;
+                    std::cout<<"  Norm. Chi-2    : "<<fHoughSpaceCircle_buff->FitParameters.sNormChi2<<cNORMAL<<std::endl;
 
 
 
@@ -1082,6 +1098,13 @@ ATEventDrawTask::DrawMC()
                fMC_XY_int->SetMarkerColor(8);
                fMC_XY_int->Draw("P");
 
+               fMC_XY_back = new TGraph();
+               fMC_XY_back->SetPoint(1,0,0);
+               fMC_XY_back->SetMarkerStyle(22);
+               fMC_XY_back->SetMarkerSize(1.0);
+               fMC_XY_back->SetMarkerColor(6);
+               fMC_XY_back->Draw("P");
+
                fCvsMC_Z->cd();
 
                fMC_ZX_int = new TGraph();
@@ -1097,6 +1120,21 @@ ATEventDrawTask::DrawMC()
                fMC_ZY_int->SetMarkerSize(1.0);
                fMC_ZY_int->SetMarkerColor(kBlack);
                fMC_ZY_int->Draw("P");
+
+               fMC_ZX_back = new TGraph();
+               fMC_ZX_back->SetPoint(1,0,0);
+               fMC_ZX_back->SetMarkerStyle(22);
+               fMC_ZX_back->SetMarkerSize(1.0);
+               fMC_ZX_back->SetMarkerColor(6);
+               fMC_ZX_back->Draw("P");
+
+               fMC_ZY_back = new TGraph();
+               fMC_ZY_back->SetPoint(1,0,0);
+               fMC_ZY_back->SetMarkerStyle(22);
+               fMC_ZY_back->SetMarkerSize(1.0);
+               fMC_ZY_back->SetMarkerColor(6);
+               fMC_ZY_back->Draw("P");
+
 
                fMC_ZX = new TGraph();
                fMC_ZX->SetPoint(1,0,0);
@@ -1277,8 +1315,29 @@ ATEventDrawTask::UpdateCvsQuadrants()
 void
 ATEventDrawTask::UpdateCvsMC()
 {
+  fMC_XY_exp->GetXaxis()->SetRangeUser(-300.0,300);
+  fMC_XY_exp->GetYaxis()->SetRangeUser(-300.0,300);
+  fMC_XY->GetXaxis()->SetRangeUser(-300.0,300);
+  fMC_XY->GetYaxis()->SetRangeUser(-300.0,300);
+  fMC_XY_int->GetXaxis()->SetRangeUser(-300.0,300);
+  fMC_XY_int->GetYaxis()->SetRangeUser(-300.0,300);
+  fMC_XY_back->GetXaxis()->SetRangeUser(-300.0,300);
+  fMC_XY_back->GetYaxis()->SetRangeUser(-300.0,300);
   fCvsMC_XY->Modified();
   fCvsMC_XY->Update();
+
+  fMC_ZX_int->GetXaxis()->SetRangeUser(0,1000);
+  fMC_ZX_int->GetYaxis()->SetRangeUser(-300.0,300);
+  fMC_ZY_int->GetXaxis()->SetRangeUser(0,1000);
+  fMC_ZY_int->GetYaxis()->SetRangeUser(-300.0,300);
+  fMC_ZX->GetXaxis()->SetRangeUser(0,1000);
+  fMC_ZX->GetYaxis()->SetRangeUser(-300.0,300);
+  fMC_ZY->GetXaxis()->SetRangeUser(0,1000);
+  fMC_ZY->GetYaxis()->SetRangeUser(-300.0,300);
+  fMC_ZX_back->GetXaxis()->SetRangeUser(0,1000);
+  fMC_ZX_back->GetYaxis()->SetRangeUser(-300.0,300);
+  fMC_ZY_back->GetXaxis()->SetRangeUser(0,1000);
+  fMC_ZY_back->GetYaxis()->SetRangeUser(-300.0,300);
   fCvsMC_Z->Modified();
   fCvsMC_Z->Update();
 }

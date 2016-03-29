@@ -43,7 +43,7 @@ void ATHoughSpaceLine::CalcHoughSpace(ATEvent* event,Bool_t YZplane,Bool_t XYpla
 
 		for(Int_t iHit=0; iHit<nHits; iHit++){
 			ATHit hit = event->GetHitArray()->at(iHit);
-    	                Int_t PadNumHit = hit.GetHitPadNum();
+    	Int_t PadNumHit = hit.GetHitPadNum();
 			if(hit.GetCharge()<fThreshold) continue;
    		        TVector3 position = hit.GetPosition();
 
@@ -72,7 +72,8 @@ void ATHoughSpaceLine::CalcHoughSpace(ATProtoEvent* protoevent,Bool_t q1,Bool_t 
         Char_t HoughQuadHistName[256];
         for(Int_t i=0;i<4;i++){
            sprintf(HoughQuadHistName,"HoughQuad_%d",i);
-           HistHoughRZ[i] = new TH2F(HoughQuadHistName,HoughQuadHistName,500,0,3.15,1000,0,600);
+          // HistHoughRZ[i] = new TH2F(HoughQuadHistName,HoughQuadHistName,200,0,3.15,1000,0,600);//Was (500,0,3.15,....
+           HistHoughRZ[i] = new TH2F(HoughQuadHistName,HoughQuadHistName,500,0,3.15,1000,0,600);//Was (500,0,3.15,....
 	}
 
       if(nQuads<5){
@@ -95,11 +96,11 @@ void ATHoughSpaceLine::CalcHoughSpace(ATProtoEvent* protoevent,Bool_t q1,Bool_t 
 
                             if(radius>fRadThreshold){
                               Int_t itheta=0;
-			                        #pragma omp parallel for ordered schedule(dynamic) private(itheta) //TOOD: Check performance
+			                        //#pragma omp parallel for ordered schedule(dynamic) private(itheta) //TOOD: Check performance
                               for(itheta = 0; itheta <1023; itheta++){
                                     Float_t angle = TMath::Pi()*(static_cast<Float_t>(itheta)/1023);
                                     Float_t d0_RZ = (TMath::Cos(angle)*radius)  +  (TMath::Sin(angle)*position.Z());
-                                    #pragma omp ordered
+                                    //#pragma omp ordered
                                     HistHoughRZ[iQ]->Fill(angle,d0_RZ);
                                     //#pragma omp ordered
                                     //FillHoughMap(angle,d0_RZ);
@@ -111,7 +112,7 @@ void ATHoughSpaceLine::CalcHoughSpace(ATProtoEvent* protoevent,Bool_t q1,Bool_t 
 
 
       //HoughMapKey.push_back(GetHoughParameters());
-			HoughPar.push_back(GetHoughParameters(HistHoughRZ[iQ]));
+       		HoughPar.push_back(GetHoughParameters(HistHoughRZ[iQ]));
       //HoughParSTD.push_back(GetHoughParameters());
 
          }// Quadrant loop

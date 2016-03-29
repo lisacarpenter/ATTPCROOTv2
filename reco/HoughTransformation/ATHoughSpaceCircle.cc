@@ -27,6 +27,7 @@ ATHoughSpaceCircle::ATHoughSpaceCircle()
     fTheta = new std::vector<Double_t>;
     fIniHit = new ATHit();
     fClusteredHits = new std::vector<ATHit>;
+    for(Int_t i;i<8;i++) fParameter[i]=0.0;
 
 
 
@@ -77,6 +78,7 @@ void ATHoughSpaceCircle::CalcHoughSpace(ATEvent* event,Bool_t YZplane,Bool_t XYp
 
 
   ATMinimization *min = new ATMCMinimization();
+  min->ResetParameters();
 
   //TH2F *RadVSTb = new TH2F("RadVSTb","RadVSTb",100,0,500,100,0,500);
   //TH1F *Phi = new TH1F("Phi","Phi",512,0,512);
@@ -379,7 +381,7 @@ void ATHoughSpaceCircle::CalcHoughSpace(ATEvent* event,Bool_t YZplane,Bool_t XYp
 
 
                     TVector3 IniHitPos = fIniHit->GetPosition();
-                    Double_t* parameter = new Double_t[8];
+                    Double_t *parameter = new Double_t[8];
                     parameter[0]=IniHitPos.X();
                     parameter[1]=IniHitPos.Y();
                     parameter[2]=IniHitPos.Z();
@@ -389,11 +391,16 @@ void ATHoughSpaceCircle::CalcHoughSpace(ATEvent* event,Bool_t YZplane,Bool_t XYp
                     parameter[6]=fIniTheta;
                     parameter[7]=fIniHitID;
 
+                    for(Int_t i=0;i<8;i++) fParameter[i]=parameter[i];
 
 
+                    Double_t HoughAngleDeg = fHoughLinePar.first*180.0/TMath::Pi();
 
+                    //std::cout<<" Hough Angle "<<HoughAngleDeg<<std::endl;
 
-                   min->Minimize(parameter,event);
+                if (   HoughAngleDeg<90.0 && HoughAngleDeg>45.0 ) { // Check RxPhi plot to adjust the angle
+
+                   min->MinimizeOpt(parameter,event);
                    fPosXmin = min->GetPosXMin();
                    fPosYmin = min->GetPosYMin();
                    fPosZmin = min->GetPosZMin();
@@ -403,16 +410,55 @@ void ATHoughSpaceCircle::CalcHoughSpace(ATEvent* event,Bool_t YZplane,Bool_t XYp
                    fPosXinter = min->GetPosXInt();
                    fPosYinter = min->GetPosYInt();
                    fPosZinter = min->GetPosZInt();
-                   ATHoughSpaceCircle::FitParameters.sThetaMin = min->FitParameters.sThetaMin;
-                   ATHoughSpaceCircle::FitParameters.sThetaMin = min->FitParameters.sThetaMin;
-                   ATHoughSpaceCircle::FitParameters.sEnerMin  = min->FitParameters.sEnerMin;
-                   ATHoughSpaceCircle::FitParameters.sPosMin   = min->FitParameters.sPosMin;
-                   ATHoughSpaceCircle::FitParameters.sBrhoMin  = min->FitParameters.sBrhoMin;
-                   ATHoughSpaceCircle::FitParameters.sBMin     = min->FitParameters.sBMin;
-                   ATHoughSpaceCircle::FitParameters.sPhiMin   = min->FitParameters.sPhiMin;
-                   ATHoughSpaceCircle::FitParameters.sChi2Min   = min->FitParameters.sChi2Min;
-                   delete min;
+                   fPosXBack = min->GetPosXBack();
+                   fPosYBack = min->GetPosYBack();
+                   fPosZBack = min->GetPosZBack();
+                   ATHoughSpaceCircle::FitParameters.sThetaMin        = min->FitParameters.sThetaMin;
+                   ATHoughSpaceCircle::FitParameters.sThetaMin        = min->FitParameters.sThetaMin;
+                   ATHoughSpaceCircle::FitParameters.sEnerMin         = min->FitParameters.sEnerMin;
+                   ATHoughSpaceCircle::FitParameters.sPosMin          = min->FitParameters.sPosMin;
+                   ATHoughSpaceCircle::FitParameters.sBrhoMin         = min->FitParameters.sBrhoMin;
+                   ATHoughSpaceCircle::FitParameters.sBMin            = min->FitParameters.sBMin;
+                   ATHoughSpaceCircle::FitParameters.sPhiMin          = min->FitParameters.sPhiMin;
+                   ATHoughSpaceCircle::FitParameters.sChi2Min         = min->FitParameters.sChi2Min;
+                   ATHoughSpaceCircle::FitParameters.sVertexPos       = min->FitParameters.sVertexPos;
+                   ATHoughSpaceCircle::FitParameters.sVertexEner      = min->FitParameters.sVertexEner;
+                   ATHoughSpaceCircle::FitParameters.sMinDistAppr     = min->FitParameters.sMinDistAppr;
+                   ATHoughSpaceCircle::FitParameters.sNumMCPoint      = min->FitParameters.sNumMCPoint;
+                   ATHoughSpaceCircle::FitParameters.sNormChi2        = min->FitParameters.sNormChi2;
+                  }
+                  else
+                  {
+                    fPosXmin.clear();
+                    fPosYmin.clear();
+                    fPosZmin.clear();
+                    fPosXexp.clear();
+                    fPosYexp.clear();
+                    fPosZexp.clear();
+                    fPosXinter.clear();
+                    fPosYinter.clear();
+                    fPosZinter.clear();
+                    fPosXBack.clear();
+                    fPosYBack.clear();
+                    fPosZBack.clear();
+                    ATHoughSpaceCircle::FitParameters.sThetaMin        = 0;
+                    ATHoughSpaceCircle::FitParameters.sThetaMin        = 0;
+                    ATHoughSpaceCircle::FitParameters.sEnerMin         = 0;
+                    ATHoughSpaceCircle::FitParameters.sPosMin.SetXYZ(0,0,0);
+                    ATHoughSpaceCircle::FitParameters.sBrhoMin         = 0;
+                    ATHoughSpaceCircle::FitParameters.sBMin            = 0;
+                    ATHoughSpaceCircle::FitParameters.sPhiMin          = 0;
+                    ATHoughSpaceCircle::FitParameters.sChi2Min         = 0;
+                    ATHoughSpaceCircle::FitParameters.sVertexPos.SetXYZ(0,0,0);
+                    ATHoughSpaceCircle::FitParameters.sVertexEner      = 0;
+                    ATHoughSpaceCircle::FitParameters.sMinDistAppr     = 0;
+                    ATHoughSpaceCircle::FitParameters.sNumMCPoint      = 0;
+                    ATHoughSpaceCircle::FitParameters.sNormChi2        = 0;
 
+
+                  }
+                   delete min;
+                   delete parameter;
 
                     //hdist->Draw();
                     //distVSTb->Draw("zcol");
