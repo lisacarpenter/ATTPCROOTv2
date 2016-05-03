@@ -65,6 +65,26 @@ void run_unpack_proto_8He_2(Int_t runNo = 100,Int_t EvNo=0, TString parameterFil
    	psaTask -> SetPeakFinder(); //Note: For the moment not affecting the prototype PSA Task
    	run -> AddTask(psaTask);
 
+    //Moved to analysis macro!
+	ATPhiRecoTask *phirecoTask = new ATPhiRecoTask();
+	phirecoTask -> SetPersistence();
+	run -> AddTask(phirecoTask);
+	
+	ATHoughTask *HoughTask = new ATHoughTask();
+	HoughTask->SetPhiReco();
+	HoughTask->SetPersistence();
+	HoughTask->SetLinearHough();
+	HoughTask->SetRadiusThreshold(3.0); // Truncate Hough Space Calculation
+	//HoughTask ->SetCircularHough();
+	run ->AddTask(HoughTask);
+	
+	ATAnalysisTask *AnaTask = new ATAnalysisTask();
+	AnaTask->SetPhiReco();
+	AnaTask->SetHoughDist(2.0);
+	AnaTask->SetPersistence(kTRUE);
+	
+	run->AddTask(AnaTask);
+
    	run->Init();
 
 	if(EvNo==0)	{ run->RunOnTBData(); }
