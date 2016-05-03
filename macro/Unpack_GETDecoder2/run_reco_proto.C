@@ -37,9 +37,6 @@ void run_reco_proto(Int_t runNo = 100, Int_t evNo=100, TString parameterFile = "
 	FairRuntimeDb* rtdb = run->GetRuntimeDb();
 	FairParAsciiFileIo* parIo1 = new FairParAsciiFileIo();
 	parIo1 -> open(paramterFileWithPath.Data(), "in");
-	//FairParRootFileIo* parIo2 = new FairParRootFileIo();
-	//parIo2 -> open("param.dummy_proto.root");
-	// rtdb -> setFirstInput(parIo2);
 	rtdb -> setSecondInput(parIo1);
 	
 	ATPhiRecoTask *phirecoTask = new ATPhiRecoTask();
