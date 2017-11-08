@@ -168,7 +168,8 @@ ATPSAProto::Analyze(ATRawEvent *rawEvent, ATEvent *event)
 
                 if(PadHitNum==1){ //Construct mesh signal only once
                 	for (Int_t iTb = 0; iTb < fNumTbs; iTb++){
-                		mesh[iTb]+=floatADC[iTb];
+                    if(floatADC[iTb]>fThreshold){
+                		mesh[iTb]+=floatADC[iTb];}
                 		/* if(iTb==511){
                 		 std::cout<<" IPad : "<<iPad<<std::endl;
                 		 std::cout<<" iTb : "<<iTb<<" FloatADC : "<<floatADC[iTb]<<" mesh : "<<mesh[iTb]<<std::endl;

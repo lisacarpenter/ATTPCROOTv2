@@ -7,16 +7,16 @@ ATProtoQuadrant::ATProtoQuadrant()
 
    fEventID = -1;
    fPhiQ = 0.0;
-   
+
 }
 
 ATProtoQuadrant::ATProtoQuadrant(Int_t QuadrantID)
 {
-  
+
     fEventID = -1;
     fQuadrantID = QuadrantID;
     fPhiQ = 0.0;
-    
+
 }
 
 
@@ -26,7 +26,7 @@ ATProtoQuadrant::ATProtoQuadrant(std::vector<ATHit> *HitArray,Int_t QuadrantID)
     fQuadrantID = QuadrantID;
     fHitArrayQ = *HitArray;
     fPhiQ = 0.0;
-    
+
 }
 
 ATProtoQuadrant::ATProtoQuadrant(std::vector<ATHit> *HitArray,Int_t QuadrantID, Double_t PhiQ)
@@ -35,19 +35,20 @@ ATProtoQuadrant::ATProtoQuadrant(std::vector<ATHit> *HitArray,Int_t QuadrantID, 
     fQuadrantID = QuadrantID;
     fHitArrayQ = *HitArray;
     fPhiQ = PhiQ;
-    
+
 }
 
 ATProtoQuadrant::~ATProtoQuadrant()
 {}
 
-void ATProtoQuadrant::SetEventID(Int_t evtid)                             { fEventID = evtid; } 
+void ATProtoQuadrant::SetEventID(Int_t evtid)                             { fEventID = evtid; }
 void ATProtoQuadrant::AddHit(ATHit *hit)                                  { fHitArrayQ.push_back(*hit); }
 void ATProtoQuadrant::SetHitArray(std::vector<ATHit> *hitArray)           { fHitArrayQ = *hitArray; }
 void ATProtoQuadrant::SetQuadrantID(Int_t QuadrantID)                     { fQuadrantID = QuadrantID; }
 void ATProtoQuadrant::SetPhiQ(Double_t PhiQ)                              { fPhiQ = PhiQ; }
 void ATProtoQuadrant::SetPhiDistribution(TH1D* PhiD)                      { fPhiDistr = *PhiD;}
 void ATProtoQuadrant::AddPhiVal(Double_t phival)                          { fPhiDistrArray.push_back(phival); }
+void ATProtoQuadrant::AddRVal(Double_t rval)                              { fPhiRDistrArray.push_back(rval); }
 
 Int_t ATProtoQuadrant::GetQuadrantID()      { return fQuadrantID; }
 Double_t ATProtoQuadrant::GetPhiQ()         { return fPhiQ; }
@@ -72,3 +73,7 @@ std::vector<Double_t> *ATProtoQuadrant::GetPhiArray()
   return &fPhiDistrArray;
 }
 
+std::vector<Double_t> *ATProtoQuadrant::GetPhiRArray()
+{
+  return &fPhiRDistrArray;
+}

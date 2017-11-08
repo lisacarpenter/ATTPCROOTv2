@@ -1,4 +1,4 @@
-void run_unpack_proto_10Be(TString dataFile = "../10Be/Feb2013ND.txt",TString parameterFile = "pATTPC.Feb2013.par"){
+void run_unpack_proto_10Be(TString dataFile = "10Be_2013_run_0021.txt",TString parameterFile = "pATTPC.Feb2013.par"){
 
     // -----   Timer   --------------------------------------------------------
 	TStopwatch timer;
@@ -24,7 +24,7 @@ void run_unpack_proto_10Be(TString dataFile = "../10Be/Feb2013ND.txt",TString pa
 
 
    FairRunAna* run = new FairRunAna();
-   run -> SetOutputFile("output_proto.root");
+   run -> SetOutputFile("output_proto6.root");
    //run -> SetGeomFile("../geometry/ATTPC_Proto_v1.0.root");
 
    TString paramterFileWithPath = paraDir + parameterFile;
@@ -52,7 +52,7 @@ void run_unpack_proto_10Be(TString dataFile = "../10Be/Feb2013ND.txt",TString pa
 	 decoderTask ->SetGeo(geo.Data());
    decoderTask ->SetProtoMap(protomapdir.Data());
    decoderTask ->SetMap((Char_t const*) scriptdir.Data());
-   //decoderTask -> SetPersistence();
+   decoderTask -> SetPersistence(kFALSE);
    run -> AddTask(decoderTask);
 
    ATPSATask *psaTask = new ATPSATask();
@@ -67,13 +67,21 @@ void run_unpack_proto_10Be(TString dataFile = "../10Be/Feb2013ND.txt",TString pa
    phirecoTask -> SetPersistence();
    run -> AddTask(phirecoTask);
 
-   ATHoughTask *HoughTask = new ATHoughTask();
+	 ATRansacTask *RansacTask = new ATRansacTask();
+ 	RansacTask->SetPersistence(kTRUE);
+   RansacTask->SetDistanceThreshold(1.0);
+	 RansacTask->SetMinHitsLine(3);
+ 	run -> AddTask(RansacTask);
+
+
+/*	 ATHoughTask *HoughTask = new ATHoughTask();
    HoughTask->SetPhiReco();
    HoughTask->SetPersistence();
    HoughTask->SetLinearHough();
-	 HoughTask->SetRadiusThreshold(3.0); // Truncate Hough Space Calculation
+	 HoughTask->SetRadiusThreshold(10.0); // Truncate Hough Space Calculation
    //HoughTask ->SetCircularHough();
    run ->AddTask(HoughTask);
+
 
 	 ATAnalysisTask *AnaTask = new ATAnalysisTask();
    AnaTask->SetPhiReco();
@@ -81,11 +89,11 @@ void run_unpack_proto_10Be(TString dataFile = "../10Be/Feb2013ND.txt",TString pa
    AnaTask->SetPersistence(kTRUE);
 
    run->AddTask(AnaTask);
-
+*/
    run->Init();
 
-   run->Run(0,50000);
-	 //run -> RunOnTBData();
+  //run->Run(0,1000);
+	run -> RunOnTBData();
 
  // -----   Finish   -------------------------------------------------------
 	timer.Stop();

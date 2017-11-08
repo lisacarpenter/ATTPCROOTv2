@@ -24,6 +24,7 @@ class ATProtoQuadrant : public TObject {
         void SetPhiQ(Double_t PhiQ);
         void SetPhiDistribution(TH1D* PhiD);
         void AddPhiVal(Double_t phival);
+        void AddRVal(Double_t rval);
 
 	Int_t GetQuadrantID();
         Double_t GetPhiQ();
@@ -33,9 +34,10 @@ class ATProtoQuadrant : public TObject {
         std::vector<ATHit> *GetHitArray();
         TH1D* GetPhiDistribution();
         std::vector<Double_t> *GetPhiArray();
+        std::vector<Double_t> *GetPhiRArray();
         Int_t GetNumPhiVal();
-        
-        
+
+
   protected:
         std::vector<ATHit> fHitArrayQ; // Collection of hits in that quadrant
         Double_t fPhiQ; //Phi angle on the quadrant
@@ -44,11 +46,11 @@ class ATProtoQuadrant : public TObject {
         Int_t fEventID;
         TH1D fPhiDistr;
 	std::vector<Double_t> fPhiDistrArray;
-      
+  std::vector<Double_t> fPhiRDistrArray;
+
 
   ClassDef(ATProtoQuadrant, 1);
 
 };
 
 #endif
-

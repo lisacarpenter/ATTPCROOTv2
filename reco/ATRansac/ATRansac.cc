@@ -44,7 +44,7 @@ ATRANSACN::ATRansac::ATRansac()
   if (!fPar)
     fLogger -> Fatal(MESSAGE_ORIGIN, "ATDigiPar not found!!");*/
 
-    fTiltAng = 6.4; //fPar->GetTiltAngle();
+    fTiltAng = 0.001; //fPar->GetTiltAngle();
 
 
   pcl::console::setVerbosityLevel(pcl::console::L_ALWAYS);
@@ -69,7 +69,7 @@ TVector3 ATRANSACN::ATRansac::GetVertexMean()                                   
 void ATRANSACN::ATRansac::SetModelType(int model)                                       { fRANSACModel = model;}
 void ATRANSACN::ATRansac::SetDistanceThreshold(Float_t threshold)                       { fRANSACThreshold = threshold;}
 void ATRANSACN::ATRansac::SetMinHitsLine(Int_t nhits)                                   { fMinHitsLine = nhits;}
-void ATRANSACN::ATRansac::SetRPhiSpace()                                                { fRPhiSpace = kTRUE;}
+void ATRANSACN::ATRansac::SetRPhiSpace()                                                { fRPhiSpace = kFALSE;}
 void ATRANSACN::ATRansac::SetXYCenter(Double_t xc, Double_t yc)                         { fXCenter = xc;fYCenter=yc;}
 void ATRANSACN::ATRansac::SetRANSACPointThreshold(Float_t val)                          { fRANSACPointThreshold = val;}
 void ATRANSACN::ATRansac::SetVertexTime(Double_t val)                                   { fVertexTime = val;}
@@ -80,8 +80,7 @@ void ATRANSACN::ATRansac::CalcRANSAC(ATEvent *event)
 
     std::vector<ATTrack*> tracks = RansacPCL(event);
     //std::cout<<" Number of tracks : "<<tracks.size()<<std::endl;
-
-    if(tracks.size()>1){ //Defined in CalcGenHoughSpace
+    if(tracks.size()>0){ //Defined in CalcGenHoughSpace
       for(Int_t ntrack=0;ntrack<tracks.size();ntrack++){
         std::vector<ATHit>* trackHits = tracks.at(ntrack)->GetHitArray();
         Int_t nHits = trackHits->size();
@@ -93,7 +92,7 @@ void ATRANSACN::ATRansac::CalcRANSAC(ATEvent *event)
 
           }
       }// Tracks loop
-      FindVertex(tracks);
+      vertex_lisa(tracks);
     }// Minimum tracks
 
     // Drawing tracks against the Event
@@ -148,23 +147,23 @@ void ATRANSACN::ATRansac::CalcRANSAC(ATEvent *event)
           }
 
           track_amp->Draw();
-          exp_amp->Draw("SAME");
+          exp_amp->Draw("SAME");*/
 
         //vis_RAD->Draw();
         //exp_RAD->Draw("SAME");
 
-        */
+
 
 }
 
 void ATRANSACN::ATRansac::CalcRANSACFull(ATEvent *event)
 {
-
+        //std::cout<<"Full Calculation"<<std::endl;
         std::vector<ATTrack*> tracks = RansacPCL(event);
 
         XYZVector Z_1(0.0,0.0,1.0); // Beam direction
 
-        if(tracks.size()>1){ //Defined in CalcGenHoughSpace
+        if(tracks.size()>0){ //Defined in CalcGenHoughSpace
           for(Int_t ntrack=0;ntrack<tracks.size();ntrack++){
             std::vector<ATHit>* trackHits = tracks.at(ntrack)->GetHitArray();
             Int_t nHits = trackHits->size();
@@ -190,7 +189,6 @@ void ATRANSACN::ATRansac::CalcRANSACFull(ATEvent *event)
 
 std::vector<ATTrack*> ATRANSACN::ATRansac::RansacPCL(ATEvent *event)
 {
-
     std::vector<ATTrack*> tracks;
 
 
@@ -348,8 +346,8 @@ Int_t ATRANSACN::ATRansac::MinimizeTrack(ATTrack* track)
 
 
                 //Draw the fit
-                /*gr->Draw("p0");
-                const double * parFit = result.GetParams();
+                //gr->Draw("p0");
+                /*const double * parFit = result.GetParams();
                 int n = 1000;
                 double t0 = 0;
                 double dt = 1000;
@@ -453,7 +451,7 @@ void ATRANSACN::ATRansac::FindVertex(std::vector<ATTrack*> tracks)
 
 
       //Vector of the beam determined from the experimental data
-      XYZVector BeamDir_1(-0.106359,-0.0348344,1.0);
+      XYZVector BeamDir_1(0.0,0.0,1.0);
       //TODO:: This is for 6.5 degrees of tilting angle. Need a function to set it.
 
       // Test each line against the others to find a vertex candidate
@@ -583,13 +581,10 @@ void ATRANSACN::ATRansac::FindVertex(std::vector<ATTrack*> tracks)
                                                  PLines.push_back(PL);
                                              }
 
-
                                           }
 
                                          if(d<fLineDistThreshold)
                                           {
-
-
 
                                              if ( !CheckTrackID(track->GetTrackID(),&fTrackCand) ){
                                               //std::cout<<" Add track"<<track->GetTrackID()<<std::endl;
@@ -704,4 +699,111 @@ Int_t ATRANSACN::ATRansac::FindIndexTrack(Int_t index)
       }
       else return -1;
 
+}
+
+void ATRANSACN::ATRansac::vertex_lisa(std::vector<ATTrack*> tracks) {
+  XYZVector Z_1(0,0,1);
+  if(tracks.size()>1){
+    for(int i =0; i<tracks.size()-1;i++){
+      tracks.at(i)->SetTrackID(i);
+      for(int j=i+1;j<tracks.size();j++){
+        tracks.at(j)->SetTrackID(j);
+        std::vector<double> p = tracks.at(i)->GetFitPar();
+        std::vector<double> pp = tracks.at(j)->GetFitPar();
+        if(p.size()>0&&pp.size()>0){
+          XYZVector L_0(p[0], p[2], 0. );//p1
+          XYZVector L_1(p[1], p[3], 1. );//d1
+          XYZVector L_f0(pp[0], pp[2], 0. );//p2
+          XYZVector L_f1(pp[1], pp[3], 1. );//d2
+          double a1 = p[0];
+          double a2 = p[2];
+          double b1 = p[1];
+          double b2 = p[3];
+          double ap1 = pp[0];
+          double ap2 = pp[2];
+          double bp1 = pp[1];
+          double bp2 = pp[3];
+
+
+          double alpha, beta, A, B, C;
+
+
+          alpha = (bp1*(a1-ap1)+bp2*(a2-ap2))/(bp1*bp1 + bp2*bp2 + 1);
+          beta = (bp1*b1+bp2*b2+1)/(bp1*bp1 + bp2*bp2 + 1);
+
+
+          A = beta*(bp1*bp1 + bp2*bp2 + 1) - (bp1*b1 + bp2*b2 + 1);
+          B = (b1*b1 + b2*b2 + 1) - beta*(bp1*b1+bp2*b2+1);
+          C = beta*(bp1*(ap1-a1) + bp2*(ap2-a2)) - (b1*(ap1-a1) + b2*(ap2-a2));
+
+
+          double sol1, solf1;
+          double x,y,z,xp,yp,zp,xv,yv,zv,rv;
+          double linedist;
+
+          sol1 = -(A*alpha + C)/(A*beta + B);
+          solf1 = alpha + beta* sol1;
+
+          x = a1 + b1*sol1;
+          y = a2 + b2*sol1;
+          z = sol1;
+          xp = ap1 + bp1*solf1;
+          yp = ap2 + bp2*solf1;
+          zp = solf1;
+
+          xv = (x+xp)/2.;
+          yv = (y+yp)/2.;
+          zv = (z+zp)/2.;
+          rv = sqrt(pow(xv,2)+pow(yv,2));
+
+          linedist=sqrt(pow((x-xp),2) + pow((y-yp),2) + pow((z-zp),2));
+          if(rv<7.8&&zv>0&&zv<500&&linedist<fLineDistThreshold){
+            fVertex_1.SetXYZ(x,y,z);
+            fVertex_2.SetXYZ(xp,yp,zp);
+            fVertex_mean.SetXYZ(xv,yv,zv);
+            TVector3 trackvertex;
+            trackvertex.SetXYZ(xv,yv,zv);
+
+            Double_t angZi = GetAngleTracks(L_1,Z_1);
+            Double_t angZj = GetAngleTracks(L_f1,Z_1);
+            // Angles with respect to tilted detector
+            Double_t angZDeti = GetAngleTracks(L_1,Z_1);
+            Double_t angZDetj = GetAngleTracks(L_f1,Z_1);
+            Double_t angYDeti = 0.0;//GetAngleTracks(L_1,Y_1_rot);
+            Double_t angYDetj = 0.0;//GetAngleTracks(L_f1,Y_1_rot);
+
+
+            tracks.at(i)->SetAngleZAxis(angZi);
+            tracks.at(i)->SetAngleZDet(angZDeti);
+
+            tracks.at(j)->SetAngleZAxis(angZj);
+            tracks.at(j)->SetAngleZDet(angZDetj);
+
+            tracks.at(i)->SetTrackVertex(trackvertex);
+            tracks.at(j)->SetTrackVertex(trackvertex);
+
+            if ( !CheckTrackID(tracks.at(i)->GetTrackID(),&fTrackCand) ){
+              //std::cout<<" Add track 1 "<<tracks.at(i)->GetTrackID()<<std::endl;
+              fTrackCand.push_back(*tracks.at(i));
+            }
+
+            if ( !CheckTrackID(tracks.at(j)->GetTrackID(),&fTrackCand) ){
+              //std::cout<<" Add track 2 "<<tracks.at(j)->GetTrackID()<<std::endl;
+              fTrackCand.push_back(*tracks.at(j));
+            }
+          }
+
+
+
+          //cout << "Vertex 1st :" << x << "," << y << "," << z << endl;
+          //cout << "Vertex 2nd :" << xp << "," << yp << "," << zp << endl;
+          //cout << "Vertex middle :" << xv << "," << yv << "," << zv << endl;
+
+
+          //cout << "min dist " << sqrt(pow((x-xp),2) + pow((y-yp),2) + pow((z-zp),2)) << endl;
+        }
+      }
+    }
+  }
+  if(fTrackCand.size()>5) fTrackCand.resize(5);
 }

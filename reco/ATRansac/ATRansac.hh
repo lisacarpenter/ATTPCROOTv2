@@ -147,6 +147,8 @@ class ATRansac : public TObject
       static double distance2(double x,double y,double z, const double *p);
       void SetLine(double t, const double *p, double &x, double &y, double &z);
       void FindVertex(std::vector<ATTrack*> tracks);
+      void vertex_lisa(std::vector<ATTrack*> tracks);
+      double angle_lisa(ATTrack* track); 
       Bool_t CheckTrackID(Int_t trackID, std::vector<ATTrack> *trackArray); //Check if Track ID is in the list
 
 
