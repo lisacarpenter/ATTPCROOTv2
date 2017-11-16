@@ -29,6 +29,7 @@
 #include <limits>
 
 int mode1(const std::vector<int>& values)
+//returns the mode of the input vector
 {
   int old_mode = 0;
   int old_count = 0;
@@ -44,6 +45,28 @@ int mode1(const std::vector<int>& values)
     }
   }
   return old_mode;
+}
+
+int mode2(const std::vector<int>& values)
+//outputs the number of times the most common entry of the vector occurs
+{
+  int old_mode = 0;
+  int old_count = 0;
+  if(values.size()==0){
+    return 0;
+  }
+  for(size_t n=0; n < values.size(); ++n)
+  {
+    int mode = values[n];
+    int count = std::count(values.begin()+n+1, values.end(), mode);
+
+    if(count > old_count)
+    {
+      old_mode = mode;
+      old_count = count;
+    }
+  }
+  return old_count;
 }
 
 double avg(std::vector<Double_t> *v) {
@@ -74,6 +97,8 @@ void run_plot0(TString FileNameHead = "output_proto",TString fileKine="../Kinema
   TH1D* Vertex = new TH1D("Vertex","Vertex",1000,0,500000);
   TH1D* Vertex1 = new TH1D("Vertex1","Vertex1",10,0,10);
   TH2D* Vertex_vs_Angle = new TH2D("Vertex_vs_Angle","Vertex_vs_Angle",1000,0,1000,200,0,180);
+
+  TH2D* PID = new TH2D("PID","PID",100,0,10000,100,0,500000);
 
   TH2D* PhiCompare = new TH2D("PhiCompare","PhiCompare",180,0,90,180,0,90);
   TH1D* PhiCompare1 = new TH1D("PhiCompare1","PhiCompare1",500,-500,500);
@@ -118,7 +143,17 @@ void run_plot0(TString FileNameHead = "output_proto",TString fileKine="../Kinema
   wideElasticup->SetPoint(19,90,2);
   wideElasticup->SetPoint(20,90,-2);
 
+  TCutG* pidcut = new TCutG("pidcut",4);
+  pidcut->SetVarX("dE");
+  pidcut->SetVarY("E");
+  pidcut->SetTitle("Good PID");
+  pidcut->SetPoint(0,1026.36,284564.0);
+  pidcut->SetPoint(1,1026.36,128353.0);
+  pidcut->SetPoint(2,2697.63,192181.0);
+  pidcut->SetPoint(3,2697.63,247611.0);
+  pidcut->SetPoint(4,1026.36,284564.0);
 
+  Int_t viewEvent = 1316;
 
   Int_t goodnums[]={368, 546, 918, 1943, 2844, 3081, 4457, 7081, 7637, 7835, 11231, 11308, 13623, 13896, 14140, 14602, 14649, 15256, 17781, 18092, 18659, 20274, 20678, 21208, 22827, 26088, 26902, 31502, 32550, 36911, 38328,38454, 38991, 40353, 41674, 42665, 43057, 47482, 50423, 50772, 50957, 52889, 52994, 54162, 59071, 59640, 60900, 61144, 61310, 62143, 63112, 65759, 65993, 66440, 66548, 66729, 69168, 69269, 70682, 71436, 73422, 73424, 73854, 73979, 74732, 75218, 76747, 78723, 79641, 80995, 82782, 83837, 84318, 86693, 86726, 87468, 88570, 89956, 91337, 91637, 92300, 92650};
   std::vector<int> v(goodnums,goodnums+83);
@@ -142,6 +177,11 @@ void run_plot0(TString FileNameHead = "output_proto",TString fileKine="../Kinema
   std::vector<double> RedChi2;
   Double_t x;
   Double_t y;
+  std::vector<int> zlist;
+  std::vector<int> numspark;
+  std::vector<int> defkeep;
+    Double_t totalE = 0;
+    Double_t deltaE = 0;
   ofstream myfile;
   myfile.open ("stuff.txt");
 
@@ -150,11 +190,11 @@ void run_plot0(TString FileNameHead = "output_proto",TString fileKine="../Kinema
   TFileCollection *filecol = new TFileCollection();
   TString FileNameHead_num;
   TString FileNameHead_chain;
-  TString FilePath = workdir + "/macro/10Be/newmesh/";
+  TString FilePath = workdir + "/macro/10Be/";
   TString FileNameTail = ".root";
   TString FileName     = FilePath + FileNameHead + FileNameTail;
   Int_t file_ini=21;
-  Int_t file_end=21;
+  Int_t file_end=25;
   Int_t evnt = 0;
   for(Int_t i=file_ini;i<=file_end;i++){
     if(i<10) FileNameHead_num.Form("000%i",i);
@@ -189,8 +229,9 @@ void run_plot0(TString FileNameHead = "output_proto",TString fileKine="../Kinema
       Int_t NumHits                   = event->GetNumHits();
       std::vector<ATProtoQuadrant> *quadvec   = protoevent->GetQuadrantArray();
 
-
+      if(evnt==viewEvent)cout<<trackVector.size()<<endl;
       RedChi2.clear();
+      trackquads.clear();
       if(trackVector.size()>0){
         for(Int_t i=0;i<trackVector.size();i++){
           RedChi2.push_back(trackVector.at(i).GetMinimum()/double(trackVector.at(i).GetHitArray()->size()));
@@ -199,8 +240,8 @@ void run_plot0(TString FileNameHead = "output_proto",TString fileKine="../Kinema
           //myfile<<trackVector.at(i).GetMinimum()<<"\t"<<trackVector.at(i).GetHitArray()->size()<<"\t"<<RedChi2.at(i)<<endl;
           hitquads.clear();
           for(Int_t j=0;j<trackVector.at(i).GetHitArray()->size();j++){
-            ATHit *Hit = event->GetHit(i);
-            TVector3 coords= Hit->GetPosition();
+            ATHit Hit = trackVector.at(i).GetHitArray()->at(j);
+            TVector3 coords= Hit.GetPosition();
             if(coords.x()>0){
               if(coords.y()>0) hitquads.push_back(0);
               else hitquads.push_back(3);
@@ -215,8 +256,8 @@ void run_plot0(TString FileNameHead = "output_proto",TString fileKine="../Kinema
       }
       if(trackVector.size()!=RedChi2.size())cout<<"HALT "<<trackVector.size()<<" "<<RedChi2.size()<<endl;
       std::vector<std::vector<int>> numgood(5);
-      std::vector<std::vector<int>> numspark(5);
-      std::vector<int> defkeep;
+      numspark.clear();
+      defkeep.clear();
       if(trackVector.size()>0){
         Int_t i=0;
         while(i<trackVector.size()){
@@ -224,17 +265,14 @@ void run_plot0(TString FileNameHead = "output_proto",TString fileKine="../Kinema
           std::vector<ATHit>* trackhits = trackVector.at(i).GetHitArray();
           TVector3 vertexcoords = trackVector.at(i).GetTrackVertex();
           Double_t vertexrad = TMath::Sqrt(vertexcoords.x()*vertexcoords.x()+vertexcoords.y()*vertexcoords.y());
+          zlist.clear();
           for(Int_t hit1=0; hit1<trackhits->size(); hit1++){
             TVector3 coords1=trackhits->at(hit1).GetPosition();
-            for(Int_t hit2=hit1+1; hit2<trackhits->size(); hit2++){
-              TVector3 coords2=trackhits->at(hit2).GetPosition();
-              if(coords1.z()==coords2.z())numspark.at(i).push_back(hit1);
-            }
-            std::sort(numspark.at(i).begin(),numspark.at(i).end());
-            auto last = std::unique(numspark.at(i).begin(),numspark.at(i).end());
-            numspark.at(i).erase(last, numspark.at(i).end());
+            zlist.push_back(coords1.z());
           }
+          numspark.push_back(mode2(zlist));
           TPolyLine *dummy2d = new TPolyLine(1000);
+          TGraph2D *dummy3d = new TGraph2D(1000);
           for (int j = 0; j<1000;++j){
             double t = j;
             double x,y,z,r;
@@ -244,13 +282,14 @@ void run_plot0(TString FileNameHead = "output_proto",TString fileKine="../Kinema
             z = t;
             //myfile<<x<<"\t"<<y<<endl;
             dummy2d->SetPoint(j,r,z);
+            dummy3d->SetPoint(j,x,y,z);
           }
           Int_t j=i+1;
           while(j<trackVector.size()){
             std::vector<ATHit>* trackhits2 = trackVector.at(j).GetHitArray();
             for(Int_t k=0; k<trackhits2->size(); k++){
               TVector3 coords=trackhits2->at(k).GetPosition();
-              if(TMath::Abs(dummy2d->GetX()[int(floor(coords.z()))]-TMath::Sqrt(coords.x()*coords.x()+coords.y()*coords.y()))<3.5){
+              if(TMath::Sqrt(pow(coords.x()-dummy3d->GetX()[int(floor(coords.z()))],2)+pow(coords.y()-dummy3d->GetY()[int(floor(coords.z()))],2))<3.5){
                 numgood.at(j).push_back(k);
               }
             }
@@ -276,30 +315,30 @@ void run_plot0(TString FileNameHead = "output_proto",TString fileKine="../Kinema
             numgood.erase(numgood.begin()+i);
             numspark.erase(numspark.begin()+i);
           }
-          else if((trackhits->size())/2<numgood.at(i).size()){
-            //cout<<numgood[i].size()<<"\t"<<trackhits->size()<<endl;
+          else if((trackhits->size()/2)<=numgood.at(i).size()){
+            //if(evnt==viewEvent)cout<<trackhits->size()<<"\t"<<numgood.at(i).size()<<endl;
             trackVector.erase(trackVector.begin()+i);
             RedChi2.erase(RedChi2.begin()+i);
             trackquads.erase(trackquads.begin()+i);
             numgood.erase(numgood.begin()+i);
             numspark.erase(numspark.begin()+i);
           }
-          else if(numspark.at(i).size()>2){
-            //cout<<numgood[i].size()<<"\t"<<trackhits->size()<<endl;
+          else if(numspark.at(i)>trackhits->size()/2){
+            //if(evnt==viewEvent)cout<<numspark.at(i)<<"\t"<<trackhits->size()<<endl;
             trackVector.erase(trackVector.begin()+i);
             RedChi2.erase(RedChi2.begin()+i);
             trackquads.erase(trackquads.begin()+i);
             numgood.erase(numgood.begin()+i);
             numspark.erase(numspark.begin()+i);
           }
-          /*else if(vertexrad>7.4||vertexcoords.z()>500.0||vertexcoords.z()<0){
+          else if(vertexrad>15.0||vertexcoords.z()>500.0||vertexcoords.z()<0){
           //cout<<numgood[i].size()<<"\t"<<trackhits->size()<<endl;
           trackVector.erase(trackVector.begin()+i);
           RedChi2.erase(RedChi2.begin()+i);
           trackquads.erase(trackquads.begin()+i);
           numgood.erase(numgood.begin()+i);
           numspark.erase(numspark.begin()+i);
-        }*/
+        }
         else{
           i++;
         }
@@ -309,55 +348,63 @@ void run_plot0(TString FileNameHead = "output_proto",TString fileKine="../Kinema
     }
 
     Vertex1->Fill(trackVector.size());
-    Double_t totalE = 0;
+    totalE=0.0;
+    deltaE=0.0;
     for(Int_t i=0;i<410;i++){
       totalE = totalE+MeshArray[i];
-    }
-    Vertex->Fill(totalE);
-
-    if(evnt==16150){
-      cout<<trackVector.size()<<endl;
-      for(Int_t i=0; i<NumHits; i++){
-        ATHit *Hit = event->GetHit(i);
-        TVector3 coords= Hit->GetPosition();
-        //trackpic->Fill(coords.y(),coords.z());
-        trackpic->Fill(coords.x(),coords.y(),coords.z());
-        //cout<<coords.x()<<"\t"<<coords.y()<<"\t"<<coords.z()<<endl;
+      if(i>400){
+        deltaE=deltaE+MeshArray[i];
       }
-      for(Int_t i=0;i<trackVector.size();i++){
-        std::vector<Double_t> parFit = trackVector.at(i).GetFitPar();
-        std::vector<ATHit>* trackhits = trackVector.at(i).GetHitArray();
-        TVector3 vertexcoords = trackVector.at(i).GetTrackVertex();
-        cout<<"angle "<<trackVector.at(i).GetAngleZAxis()*TMath::RadToDeg()<<endl;
-        Double_t vertexrad = TMath::Sqrt(vertexcoords.x()*vertexcoords.x()+vertexcoords.y()*vertexcoords.y());
-        cout<<vertexrad<<"\t"<<vertexcoords.z()<<endl;
-        //cout<<"number of hits \t"<<trackhits->size()<<endl;
-        // for(Int_t j=0; j<trackhits->size(); j++){
-        // TVector3 coords=trackhits->at(j).GetPosition();
-        // trackpic->Fill(coords.x(),coords.y(),coords.z());
-        // cout<<coords.x()<<"\t"<<coords.y()<<"\t"<<coords.z()<<endl;
-        //}
-        //cout<<RedChi2.at(i)<<"\t"<<trackVector.at(i).GetNFree()<<endl;
-        TPolyLine3D *dummy = new TPolyLine3D(1000);
-        TPolyLine *dummy2d = new TPolyLine(1000);
-        for (int j = 210; j<1210;++j){
-          double t = j-210;
-          double x,y,z,r;
-          x = parFit[0] + parFit[1]*t;
-          y = parFit[2] + parFit[3]*t;
-          r = TMath::Sqrt(x*x+y*y);
-          z = t;
-          //myfile<<x<<"\t"<<y<<endl;
-          dummy->SetPoint(j-210,x,y,z);
-          dummy2d->SetPoint(j-210,y,z);
-        }
-        dummy->SetLineColor(kRed);
-        dummy2d->SetLineColor(kRed);
-
-        tracksGraph.push_back(dummy);
-      }
-      //break;
     }
+    //Vertex->Fill(totalE);
+    PID->Fill(deltaE,totalE);
+     if(evnt==viewEvent){
+       cout<<trackquads.size()<<endl;
+       if(!pidcut->IsInside(deltaE,totalE)){
+	cout<<"good particle"<<endl;
+	}
+       for(Int_t i=0; i<NumHits; i++){
+         ATHit *Hit = event->GetHit(i);
+         TVector3 coords= Hit->GetPosition();
+         //trackpic->Fill(coords.y(),coords.z());
+         trackpic->Fill(coords.x(),coords.y(),coords.z());
+         //cout<<coords.x()<<"\t"<<coords.y()<<"\t"<<coords.z()<<endl;
+       }
+       for(Int_t i=0;i<trackVector.size();i++){
+         std::vector<Double_t> parFit = trackVector.at(i).GetFitPar();
+         std::vector<ATHit>* trackhits = trackVector.at(i).GetHitArray();
+         TVector3 vertexcoords = trackVector.at(i).GetTrackVertex();
+         cout<<"angle "<<trackVector.at(i).GetAngleZAxis()*TMath::RadToDeg()<<endl;
+         Double_t vertexrad = TMath::Sqrt(vertexcoords.x()*vertexcoords.x()+vertexcoords.y()*vertexcoords.y());
+         cout<<vertexrad<<"\t"<<vertexcoords.z()<<endl;
+         cout<<"quadrant "<<trackquads.at(i)<<endl;
+         //cout<<"number of hits \t"<<trackhits->size()<<endl;
+         // for(Int_t j=0; j<trackhits->size(); j++){
+         // TVector3 coords=trackhits->at(j).GetPosition();
+         // trackpic->Fill(coords.x(),coords.y(),coords.z());
+         // cout<<coords.x()<<"\t"<<coords.y()<<"\t"<<coords.z()<<endl;
+         //}
+         //cout<<RedChi2.at(i)<<"\t"<<trackVector.at(i).GetNFree()<<endl;
+         TPolyLine3D *dummy = new TPolyLine3D(1000);
+         TPolyLine *dummy2d = new TPolyLine(1000);
+         for (int j = 210; j<1210;++j){
+           double t = j-210;
+           double x,y,z,r;
+           x = parFit[0] + parFit[1]*t;
+           y = parFit[2] + parFit[3]*t;
+           r = TMath::Sqrt(x*x+y*y);
+           z = t;
+           //myfile<<x<<"\t"<<y<<endl;
+           dummy->SetPoint(j-210,x,y,z);
+           dummy2d->SetPoint(j-210,y,z);
+         }
+         dummy->SetLineColor(kRed);
+         dummy2d->SetLineColor(kRed);
+
+         tracksGraph.push_back(dummy);
+       }
+	//break;
+      }
 
 
 
@@ -416,16 +463,21 @@ void run_plot0(TString FileNameHead = "output_proto",TString fileKine="../Kinema
             if(TMath::Abs(avg(Phi0Array)-avg(Phi2Array))<15.0){
               //Q02_Kine->Fill(x,y);
             }
-            if(ransac->GetVertexMean().z()>00.0&&ransac->GetVertexMean().z()<100.0){
-            //Q02_Kine->Fill(x,y);
+            if(ransac->GetVertexMean().z()>400.0&&ransac->GetVertexMean().z()<500.0){
+          //  Q02_Kine->Fill(x,y);
             }
-            Q02_Kine->Fill(x,y);
+             if(!pidcut->IsInside(deltaE,totalE)){
+             Q02_Kine->Fill(x,y);
+             //cout<<evnt<<endl;
+
+
+//PID->Fill(deltaE, totalE);
             if(!wideElasticup->IsInside(x,y)){
               //cout<<"noise "<<evnt<<endl;
             }
-            if(x-y<10.0){
-              cout<<"line "<<evnt<<endl;
-            }
+            // if(x-y<10.0){
+            //   cout<<"line "<<evnt<<endl;
+            // }
             if(wideElasticup->IsInside(x,y)){
               //Q02_Kine->Fill(x,y);
               thetacm=180-(2*x);
@@ -448,6 +500,7 @@ void run_plot0(TString FileNameHead = "output_proto",TString fileKine="../Kinema
 
               }
             }
+}
           }
         }
       }
@@ -456,7 +509,9 @@ void run_plot0(TString FileNameHead = "output_proto",TString fileKine="../Kinema
 
 
 
-
+numgood.clear();
+numspark.clear();
+defkeep.clear();
       if(evnt%10000==0)std::cout<<" Event : "<<evnt<<std::endl;
       evnt++;
     }
@@ -507,26 +562,29 @@ void run_plot0(TString FileNameHead = "output_proto",TString fileKine="../Kinema
   TGraph *Kine_AngRec_AngSca_In_vert = new TGraph(numKin,ThetaLabScaIn,ThetaLabRecIn);
 
   c2->cd(1);
-  Vertex->Draw();
+gPad->SetLogz();
+  PID->Draw("colz");
+  pidcut->Draw("same");
+//Vertex->Draw();
   c2->cd(2);
   Vertex1->Draw();
 
   c3->cd();
   gPad->SetLogz();
   Q02_Kine->Draw("colz");
-  // Kine_AngRec_AngSca->Draw("C");
-  // Kine_AngRec_AngSca_vert->Draw("C");
-  // Kine_AngRec_AngSca_In->Draw("C");
-  // Kine_AngRec_AngSca_In_vert->Draw("C");
+  Kine_AngRec_AngSca->Draw("C");
+  Kine_AngRec_AngSca_vert->Draw("C");
+  Kine_AngRec_AngSca_In->Draw("C");
+  Kine_AngRec_AngSca_In_vert->Draw("C");
   // wideElasticup->Draw("same");
 
 
   c4->cd();
   //dalitz->Draw("same");
-  trackpic->Draw();
-  for(Int_t i =0;i<tracksGraph.size();i++){
-    tracksGraph.at(i)->Draw("same");
-  }
+ //trackpic->Draw();
+ //for(Int_t i =0;i<tracksGraph.size();i++){
+//   tracksGraph.at(i)->Draw("same");
+// }
 
   c5->cd(1);
   PhiCompare->Draw("*");

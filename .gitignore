@@ -1,6 +1,7 @@
 *.swp
 *.root
 *.log
+10Be_2013_run_*.txt
 gphysi.dat
 core_dump*
 build
@@ -37,6 +38,9 @@ data
 *.tar.gz
 *.zip
 
+# Images
+*.pdf
+*.png
 
 # CMake
 CMakeCache.txt

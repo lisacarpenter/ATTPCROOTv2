@@ -83,6 +83,15 @@ void run_plothough(TString FileNameHead = "output_protoh"){
   TGraph *Kine_AngRec_AngSca_vert = new TGraph(numKin,ThetaLabSca,ThetaLabRec);
   Kine_AngRec_AngSca_vert->SetLineColor(6);
 
+  TCutG* pidcut = new TCutG("pidcut",4);
+  pidcut->SetVarX("dE");
+  pidcut->SetVarY("E");
+  pidcut->SetTitle("Good PID");
+  pidcut->SetPoint(0,1026.36,284564.0);
+  pidcut->SetPoint(1,1026.36,128353.0);
+  pidcut->SetPoint(2,2697.63,192181.0);
+  pidcut->SetPoint(3,2697.63,247611.0);
+  pidcut->SetPoint(4,1026.36,284564.0);
 
   TCutG* wideElasticup = new TCutG("wideElasticup",20);
   wideElasticup->SetVarX("Angle0");
@@ -122,6 +131,7 @@ void run_plothough(TString FileNameHead = "output_protoh"){
   TTreeReader Reader1("cbmsim", file);
   TTreeReaderValue<TClonesArray> protoeventArray(Reader1, "ATProtoEvent");
   TTreeReaderValue<TClonesArray> analysisArray(Reader1, "ATProtoEventAna");
+  TTreeReaderValue<TClonesArray> eventArray(Reader1, "ATEventH");
 
   Int_t nEve =0;
   while (Reader1.Next()){
@@ -131,8 +141,10 @@ void run_plothough(TString FileNameHead = "output_protoh"){
     y2=0;
     ATProtoEventAna* analysis = (ATProtoEventAna*) analysisArray->At(0);
     ATProtoEvent* protoevent = (ATProtoEvent*) protoeventArray->At(0);
+    ATEvent* event = (ATEvent*) eventArray->At(0);
     std::vector<Double_t> *AngleFit = analysis->GetAngleFit();
     std::vector<Double_t> *vertex   = analysis->GetVertex();
+    Float_t *MeshArray              = event->GetMesh();
     std::vector<ATProtoQuadrant> *quadvec   = protoevent->GetQuadrantArray();
     if(AngleFit->at(2)>AngleFit->at(0)) {
       x1 = AngleFit->at(2);
@@ -149,6 +161,15 @@ void run_plothough(TString FileNameHead = "output_protoh"){
     if(AngleFit->at(1)>AngleFit->at(3)){
       x2 = AngleFit->at(1);
       y2 = AngleFit->at(3);
+    }
+
+    Double_t totalE = 0;
+    Double_t deltaE = 0;
+    for(Int_t i=0;i<410;i++){
+      totalE = totalE+MeshArray[i];
+      if(i>400){
+        deltaE=deltaE+MeshArray[i];
+      }
     }
 
     TH1D* PhiDistr[5];
@@ -209,9 +230,12 @@ void run_plothough(TString FileNameHead = "output_protoh"){
 
     if(x1>5.0&&y1>5.0){
       //cout<<nEve<<" , "<<endl;
+      if(!pidcut->IsInside(deltaE,totalE)){
       Q02_Kine->Fill(x1,y1);
+
       if(wideElasticup->IsInside(x1,y1)){
         //Q02_Kine->Fill(x1,y1);
+cout<<"good "<<nEve<<endl;
         Excitation_EL->Fill(180-2*x1,(vertex->at(0)+vertex->at(2))/2.0);
         //cout<<nEve<<"\t"<<180-2*x2<<"\t"<<(vertex->at(1)+vertex->at(3))/2.0<<endl;
       //   std::vector<Double_t> *Phi0Array =quadvec->at(0).GetPhiArray();
@@ -295,12 +319,16 @@ void run_plothough(TString FileNameHead = "output_protoh"){
          //if(quadvec->at(0).GetNumHits()>25&&quadvec->at(2).GetNumHits()>25)PhiCompare1->Fill(phi0-phi2);
       }
     }
+    }
 
     if(x2>5.0&&y2>5.0){
       //cout<<nEve<<" , "<<endl;
+      if(!pidcut->IsInside(deltaE,totalE)){
       Q02_Kine->Fill(x2,y2);
+
       if(wideElasticup->IsInside(x2,y2)){
         //Q02_Kine->Fill(x2,y2);
+	cout<<"good "<<nEve<<endl;
         Excitation_EL->Fill(180-2*x2,(vertex->at(1)+vertex->at(3))/2.0);
         //cout<<nEve<<"\t"<<180-2*x2<<"\t"<<(vertex->at(1)+vertex->at(3))/2.0<<endl;
       //   std::vector<Double_t> *Phi0Array =quadvec->at(1).GetPhiArray();
@@ -383,6 +411,7 @@ void run_plothough(TString FileNameHead = "output_protoh"){
       //   if(quadvec->at(1).GetNumHits()>quadvec->at(3).GetNumHits())PhiCompare->Fill(quadvec->at(3).GetNumHits(),TMath::Abs(phi1-phi3));
          //if(quadvec->at(1).GetNumHits()>25&&quadvec->at(3).GetNumHits()>25)PhiCompare1->Fill(phi1-phi3);
        }
+     }
     }
     if(nEve==800){
       for(Int_t iQ=0; iQ<4; iQ++){
@@ -431,6 +460,7 @@ void run_plothough(TString FileNameHead = "output_protoh"){
       PhiDistr[iQ]->Delete();
       PhiGr[iQ]->Delete();
     }*/
+    if(nEve==10000)break;
   }
   c2->cd(1);
   PhiCompare->Draw("colz");

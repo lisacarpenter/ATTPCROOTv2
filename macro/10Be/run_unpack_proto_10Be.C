@@ -24,7 +24,7 @@ void run_unpack_proto_10Be(TString dataFile = "10Be_2013_run_0021.txt",TString p
 
 
    FairRunAna* run = new FairRunAna();
-   run -> SetOutputFile("output_proto6.root");
+   run -> SetOutputFile("output_proto.root");
    //run -> SetGeomFile("../geometry/ATTPC_Proto_v1.0.root");
 
    TString paramterFileWithPath = paraDir + parameterFile;
@@ -74,7 +74,7 @@ void run_unpack_proto_10Be(TString dataFile = "10Be_2013_run_0021.txt",TString p
  	run -> AddTask(RansacTask);
 
 
-/*	 ATHoughTask *HoughTask = new ATHoughTask();
+	/* ATHoughTask *HoughTask = new ATHoughTask();
    HoughTask->SetPhiReco();
    HoughTask->SetPersistence();
    HoughTask->SetLinearHough();
@@ -92,7 +92,7 @@ void run_unpack_proto_10Be(TString dataFile = "10Be_2013_run_0021.txt",TString p
 */
    run->Init();
 
-  //run->Run(0,1000);
+  //run->Run(0,10000);
 	run -> RunOnTBData();
 
  // -----   Finish   -------------------------------------------------------
