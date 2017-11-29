@@ -67,7 +67,7 @@ void run_sim_ana_v2(Int_t num_ev=10000)
     c5->Divide(2,2);
     c5->Draw();
 
-    TString mcFileNameHead = "data/attpcsim";
+    TString mcFileNameHead = "data/attpcsim_2";
     TString mcFileNameTail = ".root";
     TString mcFileName     = mcFileNameHead + mcFileNameTail;
     std:cout << " Analysis of simulation file  " << mcFileName << endl;

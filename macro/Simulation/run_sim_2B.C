@@ -1,4 +1,4 @@
-void run_sim_2B(Int_t nEvents = 10, TString mcEngine = "TGeant4")
+void run_sim_2B(Int_t nEvents = 100000, TString mcEngine = "TGeant4")
 {
 
   TString dir = getenv("VMCWORKDIR");
@@ -44,7 +44,7 @@ void run_sim_2B(Int_t nEvents = 10, TString mcEngine = "TGeant4")
   run->AddModule(pipe);*/
 
   FairDetector* ATTPC = new AtTpc("ATTPC", kTRUE);
-  ATTPC->SetGeometryFileName("ATTPC_v1.2.root");
+  ATTPC->SetGeometryFileName("ATTPC_Proto_v1.0.root");
   //ATTPC->SetModifyGeometry(kTRUE);
   run->AddModule(ATTPC);
 
@@ -69,17 +69,17 @@ void run_sim_2B(Int_t nEvents = 10, TString mcEngine = "TGeant4")
 
 
                   // Beam Information
-                Int_t z = 18;  // Atomic number
-	        Int_t a = 40; // Mass number
+                Int_t z = 4;  // Atomic number
+	        Int_t a = 10; // Mass number
 	        Int_t q = 0;   // Charge State
 	        Int_t m = 1;   // Multiplicity  NOTE: Due the limitation of the TGenPhaseSpace accepting only pointers/arrays the maximum multiplicity has been set to 10 particles.
 	        Double_t px = 0.000/a;  // X-Momentum / per nucleon!!!!!!
 	        Double_t py = 0.000/a;  // Y-Momentum / per nucleon!!!!!!
-	        Double_t pz = 3.663/a;  // Z-Momentum / per nucleon!!!!!!
+	        Double_t pz = 0.8016/a;  // Z-Momentum / per nucleon!!!!!!
   	        Double_t BExcEner = 0.0;
-                Double_t Bmass = 37.22472; //Mass in GeV
-                Double_t NomEnergy = 179.83; //Nominal Energy of the beam: Only used for cross section calculation (Tracking energy is determined with momentum). TODO: Change this to the energy after the IC
-                Double_t TargetMass = 0.938272;//Mass in GeV
+                Double_t Bmass = 9.3; //Mass in GeV
+                Double_t NomEnergy = 39.5; //Nominal Energy of the beam: Only used for cross section calculation (Tracking energy is determined with momentum). TODO: Change this to the energy after the IC
+                Double_t TargetMass = 3.72;//Mass in GeV
 
 
 	          ATTPCIonGenerator* ionGen = new ATTPCIonGenerator("Ion",z,a,q,m,px,py,pz,BExcEner,Bmass,NomEnergy);
@@ -124,34 +124,34 @@ void run_sim_2B(Int_t nEvents = 10, TString mcEngine = "TGeant4")
             		  ExE.push_back(BExcEner);
 
                   // ---- Target ----
-                  Zp.push_back(1); // p
-            		  Ap.push_back(1); //
+                  Zp.push_back(2); // p
+            		  Ap.push_back(4); //
             		  Qp.push_back(0); //
             		  Pxp.push_back(0.0);
                   Pyp.push_back(0.0);
             		  Pzp.push_back(0.0);
-                  Mass.push_back(0.938272);
+                  Mass.push_back(3.72);
             		  ExE.push_back(0.0);//In MeV
 
                   //--- Scattered -----
-                  Zp.push_back(18); // 40Ar TRACKID=1
-	 	  Ap.push_back(40); //
+                  Zp.push_back(4); // 40Ar TRACKID=1
+	 	  Ap.push_back(10); //
 		  Qp.push_back(0);
 		  Pxp.push_back(0.0);
 		  Pyp.push_back(0.0);
 		  Pzp.push_back(0.0);
-		  Mass.push_back(37.22472);
+		  Mass.push_back(9.3);
 		  ExE.push_back(0.0);
 
 
                   // ---- Recoil -----
-		  Zp.push_back(1); // p  TRACKID=2
-		  Ap.push_back(1); //
+		  Zp.push_back(2); // p  TRACKID=2
+		  Ap.push_back(4); //
 		  Qp.push_back(0); //
 		  Pxp.push_back(0.0);
                   Pyp.push_back(0.0);
 		  Pzp.push_back(0.0);
-                  Mass.push_back(0.938272);
+                  Mass.push_back(3.72);
 		  ExE.push_back(0.0);//In MeV
 
 

@@ -24,6 +24,12 @@
 #define cNORMAL "\033[0m"
 #define cGREEN "\033[1;32m"
 
+void ATPulseTask::SetGeo(TString geofile)				                                               { fGeoFile = geofile; }
+void ATPulseTask::SetProtoMap(TString mapfile)	                                               { fProtoMapFile = mapfile;}
+void ATPulseTask::SetMapOpt(Int_t value)                                                       { fOpt = value; }
+Bool_t ATPulseTask::SetMap(TString map)                                                        { fMap = map; }
+
+
 
 ATPulseTask::ATPulseTask():FairTask("ATPulseTask"),
 fEventID(0)
@@ -65,14 +71,19 @@ fDriftedElectronArray = (TClonesArray *) ioman -> GetObject("ATSimulatedPoint");
   std::cout<<"Gain: "<<fGain<<std::endl;
 
   // ***************Create ATTPC Pad Plane***************************
-  TString scriptfile = "Lookup20150611.xml";
+  TString scriptfile = "LookupProto10Be.xml";
   TString dir = getenv("VMCWORKDIR");
   TString scriptdir = dir + "/scripts/"+ scriptfile;
 
-      fMap = new AtTpcMap();
-      fMap->GenerateATTPC();
-      Bool_t MapIn = fMap->ParseXMLMap(scriptdir);
-      fPadPlane = fMap->GetATTPCPlane();
+      // fAtMapPtr = new AtTpcMap();
+      // fAtMapPtr->GenerateATTPC();
+      //Bool_t MapIn = fAtMapPtr->ParseXMLMap(scriptdir);
+      fDetmap  =  new AtTpcProtoMap();
+      fDetmap -> SetProtoMap(fProtoMapFile);
+      fDetmap -> SetGeoFile(fGeoFile);
+      fDetmap -> SetName("fMap");
+      gROOT->GetListOfSpecials()->Add(fDetmap);
+      fPadPlane = fDetmap->GetATTPCPlane("ATTPC_Proto");
 
   fEventID = 0;
   fRawEvent = NULL;
@@ -214,7 +225,7 @@ ATPulseTask::Exec(Option_t* option)
          thepad = padarray[q].padnumb;
          if(thepad<10240 && thepad>0){
            pad->SetPad(thepad);
-           PadCenterCoord = fMap->CalcPadCenter(thepad);
+           PadCenterCoord = fDetmap->CalcPadCenter(thepad);
            pad->SetValidPad(kTRUE);
            pad->SetPadXCoord(PadCenterCoord[0]);
            pad->SetPadYCoord(PadCenterCoord[1]);

@@ -151,16 +151,16 @@ void run_plothough(TString FileNameHead = "output_protoh"){
       y1 = AngleFit->at(0);
     }
     if(AngleFit->at(0)>AngleFit->at(2)) {
-      x1 = AngleFit->at(0);
-      y1 = AngleFit->at(2);
+      y1 = AngleFit->at(0);
+      x1 = AngleFit->at(2);
     }
     if(AngleFit->at(3)>AngleFit->at(1)){
       x2 = AngleFit->at(3);
       y2 = AngleFit->at(1);
     }
     if(AngleFit->at(1)>AngleFit->at(3)){
-      x2 = AngleFit->at(1);
-      y2 = AngleFit->at(3);
+      y2 = AngleFit->at(1);
+      x2 = AngleFit->at(3);
     }
 
     Double_t totalE = 0;
@@ -235,7 +235,7 @@ void run_plothough(TString FileNameHead = "output_protoh"){
 
       if(wideElasticup->IsInside(x1,y1)){
         //Q02_Kine->Fill(x1,y1);
-cout<<"good "<<nEve<<endl;
+//cout<<"good "<<nEve<<endl;
         Excitation_EL->Fill(180-2*x1,(vertex->at(0)+vertex->at(2))/2.0);
         //cout<<nEve<<"\t"<<180-2*x2<<"\t"<<(vertex->at(1)+vertex->at(3))/2.0<<endl;
       //   std::vector<Double_t> *Phi0Array =quadvec->at(0).GetPhiArray();
@@ -328,7 +328,7 @@ cout<<"good "<<nEve<<endl;
 
       if(wideElasticup->IsInside(x2,y2)){
         //Q02_Kine->Fill(x2,y2);
-	cout<<"good "<<nEve<<endl;
+	//cout<<"good "<<nEve<<endl;
         Excitation_EL->Fill(180-2*x2,(vertex->at(1)+vertex->at(3))/2.0);
         //cout<<nEve<<"\t"<<180-2*x2<<"\t"<<(vertex->at(1)+vertex->at(3))/2.0<<endl;
       //   std::vector<Double_t> *Phi0Array =quadvec->at(1).GetPhiArray();
@@ -460,7 +460,7 @@ cout<<"good "<<nEve<<endl;
       PhiDistr[iQ]->Delete();
       PhiGr[iQ]->Delete();
     }*/
-    if(nEve==10000)break;
+    //if(nEve==10000)break;
   }
   c2->cd(1);
   PhiCompare->Draw("colz");

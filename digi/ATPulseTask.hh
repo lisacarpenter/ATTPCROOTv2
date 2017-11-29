@@ -18,7 +18,7 @@
 #include "TClonesArray.h"
 #include "ATDigiPar.hh"
 #include "TH2Poly.h"
-#include "AtTpcMap.h"
+#include "AtTpcProtoMap.h"
 #include "ATRawEvent.hh"
 #include "ATGas.hh"
 
@@ -34,6 +34,10 @@ class ATPulseTask : public FairTask
     virtual InitStatus Init();        //!< Initiliazation of task at the beginning of a run.
     virtual void Exec(Option_t* opt); //!< Executed for each event.
     virtual void SetParContainers();  //!< Load the parameter container from the runtime database.
+    void SetProtoMap(TString mapfile);//only for prototype
+void SetGeo(TString geofile); //only for prototype
+void SetMapOpt(Int_t value);
+Bool_t SetMap(TString map);
 
    private:
     ATGas*     fGas;                     //!< Gas parameter container.
@@ -45,8 +49,13 @@ class ATPulseTask : public FairTask
     TClonesArray* fRawEventArray;        //!< Raw Event array(only one)
     ATRawEvent* fRawEvent;               //!< Raw Event Object
     TH2Poly *fPadPlane;                  //!< pad plane
-    AtTpcMap *fMap;                      //!<ATTPC map
+    AtTpcMap *fAtMapPtr;                  //!<ATTPC map
+    AtTpcProtoMap* fDetmap;                    //!<Prototype Map
     Int_t fInternalID;                   //!<Internal ID
+    Int_t fOpt;
+    TString fGeoFile;
+    TString fProtoMapFile;
+    TString fMap;
 
 
      ClassDef(ATPulseTask,1);
