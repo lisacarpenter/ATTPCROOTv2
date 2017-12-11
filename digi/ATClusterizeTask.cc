@@ -95,7 +95,7 @@ ATClusterizeTask::Exec(Option_t* option)
    TString   VolName;
    Double_t  tTime, entries;
 
-   Double_t zMesh          = 1000; //mm (No tilt)
+   Double_t zMesh          = 500; //mm (No tilt)
    Double_t coefDiffusion  = 0.01; //from ATMCQMinimization.cc
    //Double_t driftVelocity  = 2; //cm/us for hydrogen
    //Double_t coefT          = 0.010;

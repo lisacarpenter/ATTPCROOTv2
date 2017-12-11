@@ -1,4 +1,4 @@
-void run_sim_2B(Int_t nEvents = 100000, TString mcEngine = "TGeant4")
+void run_sim_2B(Int_t nEvents = 20000, TString mcEngine = "TGeant4")
 {
 
   TString dir = getenv("VMCWORKDIR");
@@ -54,7 +54,7 @@ void run_sim_2B(Int_t nEvents = 100000, TString mcEngine = "TGeant4")
     // -----   Magnetic field   -------------------------------------------
     // Constant Field
     AtConstField  *fMagField = new AtConstField();
-    fMagField->SetField(0., 0. ,17.58 ); // values are in kG
+    fMagField->SetField(0., 0. ,0.0 ); // values are in kG
     fMagField->SetFieldRegion(-50, 50,-50, 50, -10,230); // values are in cm
                           //  (xmin,xmax,ymin,ymax,zmin,zmax)
     run->SetField(fMagField);

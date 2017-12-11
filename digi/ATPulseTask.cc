@@ -118,6 +118,7 @@ ATPulseTask::Exec(Option_t* option)
    Double_t tau                     = 1; //shaping time (us)
    Double_t samplingtime            = 60;
    Double_t samplingrate            = 0.080; //us
+   Double_t delay                   = 1.0; //us
    Double_t timeBucket[512]         = {0};
    Int_t counter                    = 0;
    Double_t output                  = 0;
@@ -137,9 +138,8 @@ ATPulseTask::Exec(Option_t* option)
 
 
  // ***************Create Time Buckets*******************************
-   for(Double_t d = 40; d<81; d+=samplingrate){
-     timeBucket[counter] = d;
-     counter++;
+   for(Int_t d = 0; d<512; d++){
+     timeBucket[d] = d*samplingrate+delay;
    }
  // ***************Create Pulse for Each Electron********************
          //std::cout<<"Total number of entries: "<<cGREEN<<nEvents<<cNORMAL<<std::endl;
@@ -223,7 +223,7 @@ ATPulseTask::Exec(Option_t* option)
          g = gain->GetRandom();
          ATPad *pad = new ATPad();
          thepad = padarray[q].padnumb;
-         if(thepad<10240 && thepad>0){
+         if(thepad<256 && thepad>0){
            pad->SetPad(thepad);
            PadCenterCoord = fDetmap->CalcPadCenter(thepad);
            pad->SetValidPad(kTRUE);
