@@ -71,9 +71,9 @@ fDriftedElectronArray = (TClonesArray *) ioman -> GetObject("ATSimulatedPoint");
   std::cout<<"Gain: "<<fGain<<std::endl;
 
   // ***************Create ATTPC Pad Plane***************************
-  TString scriptfile = "LookupProto10Be.xml";
-  TString dir = getenv("VMCWORKDIR");
-  TString scriptdir = dir + "/scripts/"+ scriptfile;
+  // TString scriptfile = "LookupProto10Be.xml";
+  // TString dir = getenv("VMCWORKDIR");
+  // TString scriptdir = dir + "/scripts/"+ scriptfile;
 
       // fAtMapPtr = new AtTpcMap();
       // fAtMapPtr->GenerateATTPC();
@@ -81,7 +81,7 @@ fDriftedElectronArray = (TClonesArray *) ioman -> GetObject("ATSimulatedPoint");
       fDetmap  =  new AtTpcProtoMap();
       fDetmap -> SetProtoMap(fProtoMapFile);
       fDetmap -> SetGeoFile(fGeoFile);
-      fDetmap -> SetName("fMap");
+      fDetmap -> SetName("ATTPC_Proto");
       gROOT->GetListOfSpecials()->Add(fDetmap);
       fPadPlane = fDetmap->GetATTPCPlane("ATTPC_Proto");
 
@@ -151,8 +151,9 @@ ATPulseTask::Exec(Option_t* option)
          yElectron                     = coord (1); //mm
          eTime                         = coord (2); //us
          counter                       = 0;
-         pBin                          = fPadPlane->Fill(xElectron,yElectron,c);
-         padNumber                     = pBin-1;
+         fPadPlane->Fill(xElectron,yElectron,c);
+         pBin                          = fPadPlane->FindBin(xElectron,yElectron);
+         padNumber                     = fDetmap->BinToPad(pBin);
          Double_t pointmem[1000][3]    = {0};
          Double_t digital[512]         = {0};
 
@@ -171,7 +172,7 @@ ATPulseTask::Exec(Option_t* option)
          //if(iEvents % 1000 == 0)   std::cout<<"Number of Electrons Processed: "<<cRED<<iEvents<<cNORMAL<<std::endl;
 
          // *********Pulse Generation for each electron************
-         for(Double_t j = eTime; j<eTime+10; j+=samplingrate/5){
+         for(Double_t j = eTime; j<eTime+10; j+=samplingrate/5.0){
            output                = pow(2.718,-3*((j-eTime)/tau))*sin((j-eTime)/tau)*pow((j-eTime)/tau,3);
            pointmem[counter][0]  = j;
            pointmem[counter][1]  = output;

@@ -115,12 +115,11 @@ ATClusterizeTask::Exec(Option_t* option)
          VolName=fMCPoint->GetVolName();
          Int_t trackID  = fMCPoint->GetTrackID();
          if(VolName == "drift_volume"){
-           tTime             = fMCPoint->GetTime()/1000; //us
            x                 = fMCPoint->GetXIn()*10; //mm
            y                 = fMCPoint->GetYIn()*10; //mm
-           z                 = 100-(fMCPoint->GetZIn()*10); //mm
+           z                 = 500-(fMCPoint->GetZIn()*10); //mm
            energyLoss_rec    =(fMCPoint -> GetEnergyLoss() )*1000;//MeV
-           nElectrons        = energyLoss_rec/fEIonize; //mean electrons generated
+           nElectrons        = int(floor(energyLoss_rec/fEIonize)); //mean electrons generated
            eFlux             = pow(fano*nElectrons, 0.5);//fluctuation of generated electrons
            genElectrons      = gRandom->Gaus(nElectrons, eFlux);//generated electrons
 
@@ -131,12 +130,12 @@ ATClusterizeTask::Exec(Option_t* option)
 
            for(Int_t charge = 0; charge<genElectrons; charge++){   //for every electron in the cluster
                //r               = trans->GetRandom(); //non-Gaussian cloud
-		r               = gRandom -> Gaus(0,sigstrtrans); //Gaussian cloud
+		           r               = gRandom -> Gaus(0,sigstrtrans); //Gaussian cloud
                phi             = gRandom->Uniform(0, TMath::TwoPi());
                propX           = x + r*TMath::Cos(phi);
                propY           = y + r*TMath::Sin(phi);
                driftLength     = driftLength + (gRandom -> Gaus(0,sigstrlong)); //mm
-               driftTime       = ((driftLength/10)/fVelDrift) +(tTime); //us
+               driftTime       = ((driftLength/10.0)/fVelDrift); //us
                electronNumber  +=1;
 
                //Fill container ATSimulatedPoint

@@ -1,4 +1,4 @@
-void run_sim_2B(Int_t nEvents = 20000, TString mcEngine = "TGeant4")
+void run_sim_2B(Int_t nEvents = 1000, TString mcEngine = "TGeant4")
 {
 
   TString dir = getenv("VMCWORKDIR");
@@ -71,7 +71,7 @@ void run_sim_2B(Int_t nEvents = 20000, TString mcEngine = "TGeant4")
                   // Beam Information
                 Int_t z = 4;  // Atomic number
 	        Int_t a = 10; // Mass number
-	        Int_t q = 0;   // Charge State
+	        Int_t q = 10;   // Charge State
 	        Int_t m = 1;   // Multiplicity  NOTE: Due the limitation of the TGenPhaseSpace accepting only pointers/arrays the maximum multiplicity has been set to 10 particles.
 	        Double_t px = 0.000/a;  // X-Momentum / per nucleon!!!!!!
 	        Double_t py = 0.000/a;  // Y-Momentum / per nucleon!!!!!!
@@ -126,7 +126,7 @@ void run_sim_2B(Int_t nEvents = 20000, TString mcEngine = "TGeant4")
                   // ---- Target ----
                   Zp.push_back(2); // p
             		  Ap.push_back(4); //
-            		  Qp.push_back(0); //
+            		  Qp.push_back(4); //
             		  Pxp.push_back(0.0);
                   Pyp.push_back(0.0);
             		  Pzp.push_back(0.0);
@@ -136,7 +136,7 @@ void run_sim_2B(Int_t nEvents = 20000, TString mcEngine = "TGeant4")
                   //--- Scattered -----
                   Zp.push_back(4); // 40Ar TRACKID=1
 	 	  Ap.push_back(10); //
-		  Qp.push_back(0);
+		  Qp.push_back(4);
 		  Pxp.push_back(0.0);
 		  Pyp.push_back(0.0);
 		  Pzp.push_back(0.0);
@@ -147,7 +147,7 @@ void run_sim_2B(Int_t nEvents = 20000, TString mcEngine = "TGeant4")
                   // ---- Recoil -----
 		  Zp.push_back(2); // p  TRACKID=2
 		  Ap.push_back(4); //
-		  Qp.push_back(0); //
+		  Qp.push_back(10); //
 		  Pxp.push_back(0.0);
                   Pyp.push_back(0.0);
 		  Pzp.push_back(0.0);
