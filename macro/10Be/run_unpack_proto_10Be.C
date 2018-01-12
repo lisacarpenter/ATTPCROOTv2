@@ -52,13 +52,13 @@ void run_unpack_proto_10Be(TString dataFile = "10Be_2013_run_0021.txt",TString p
 	 decoderTask ->SetGeo(geo.Data());
    decoderTask ->SetProtoMap(protomapdir.Data());
    decoderTask ->SetMap((Char_t const*) scriptdir.Data());
-   decoderTask -> SetPersistence(kFALSE);
+   decoderTask -> SetPersistence(kTRUE);
    run -> AddTask(decoderTask);
 
    ATPSATask *psaTask = new ATPSATask();
    psaTask -> SetPersistence();
    psaTask -> SetBackGroundPeakFinder(kFALSE); // Suppress background of each pad for noisy data (Larger computing Time)
-   psaTask -> SetThreshold(20);
+   psaTask -> SetThreshold(40);
    psaTask -> SetPeakFinder(); //Note: For the moment not affecting the prototype PSA Task
    run -> AddTask(psaTask);
 
@@ -92,8 +92,8 @@ void run_unpack_proto_10Be(TString dataFile = "10Be_2013_run_0021.txt",TString p
 */
    run->Init();
 
-  //run->Run(0,10000);
-	run -> RunOnTBData();
+  run->Run(0,2000);
+	//run -> RunOnTBData();
 
  // -----   Finish   -------------------------------------------------------
 	timer.Stop();

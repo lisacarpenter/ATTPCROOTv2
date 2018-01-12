@@ -210,7 +210,7 @@ std::vector<ATTrack*> ATRANSACN::ATRansac::RansacPCL(ATEvent *event)
 
           ATHit* hit = event->GetHit(iHit);
           Int_t PadNumHit = hit->GetHitPadNum();
-          TVector3 position = hit->GetPosition();
+          TVector3 position = hit->GetPositionCorr();
 
         if(fRPhiSpace){
           cloud->points[iHit].x = hit->GetTimeStamp();
@@ -299,7 +299,7 @@ Int_t ATRANSACN::ATRansac::MinimizeTrack(ATTrack* track)
 
             for(Int_t N=0;N<HitArray->size();N++){
               ATHit hit = HitArray->at(N);
-              TVector3 pos = hit.GetPosition();
+              TVector3 pos = hit.GetPositionCorr();
               gr->SetPoint(N,pos.X(),pos.Y(),pos.Z());
             }
 
@@ -379,7 +379,7 @@ Int_t ATRANSACN::ATRansac::MinimizeTrackRPhi(ATTrack* track)
 
       for(Int_t N=0;N<HitArray->size();N++){
         ATHit hit = HitArray->at(N);
-        TVector3 pos = hit.GetPosition();
+        TVector3 pos = hit.GetPositionCorr();
         Double_t xdum = hit.GetTimeStamp();
         Double_t ydum = TMath::Sqrt(  TMath::Power((fXCenter-pos.X()),2)   +  TMath::Power((fYCenter-pos.Y()),2)    )*TMath::ATan2(fXCenter-pos.X(),fYCenter-pos.Y());
         gr->SetPoint(N,xdum,ydum);

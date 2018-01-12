@@ -152,11 +152,12 @@ void run_plot0(Int_t runnum=21)
   pidcut->SetVarX("dE");
   pidcut->SetVarY("E");
   pidcut->SetTitle("Good PID");
-  pidcut->SetPoint(0,1026.36,284564.0);
-  pidcut->SetPoint(1,1026.36,128353.0);
-  pidcut->SetPoint(2,2697.63,192181.0);
-  pidcut->SetPoint(3,2697.63,247611.0);
-  pidcut->SetPoint(4,1026.36,284564.0);
+  pidcut->SetPoint(0,97.94,332823.0);
+  pidcut->SetPoint(1,784.462,329883.0);
+  pidcut->SetPoint(2,1753.34,275657.0);
+  pidcut->SetPoint(3,1437.76,240704.0);
+  pidcut->SetPoint(4,97.94,294276.0);
+  pidcut->SetPoint(5,97.94,332823.0);
 
   Int_t viewEvent = 1316;
 
@@ -173,7 +174,7 @@ void run_plot0(Int_t runnum=21)
   }
   Double_t energycm;
   Double_t thetacm;
-  Int_t offset = 585;
+  Int_t offset = 500;
   Double_t maxchi2=50.0;
   std::vector<TPolyLine3D*> tracksGraph;
   std::vector<Int_t> trackquads;
@@ -194,7 +195,7 @@ void run_plot0(Int_t runnum=21)
   TFileCollection *filecol = new TFileCollection();
   TString FileNameHead_num;
   TString FileNameHead_chain;
-  TString FilePath = workdir + "/macro/10Be/sim/";
+  TString FilePath = workdir + "/macro/10Be/allpads/";
   TString FileNameTail = ".root";
   TString FileName     = FilePath + FileNameHead + FileNameTail;
   Int_t file_ini=runnum;
@@ -367,9 +368,9 @@ void run_plot0(Int_t runnum=21)
       if(evnt==viewEvent){
         //viewing an event
         cout<<trackquads.size()<<endl;
-        if(!pidcut->IsInside(deltaE,totalE)){
-          cout<<"good particle"<<endl;
-        }
+       // if(!pidcut->IsInside(deltaE,totalE)){
+       // cout<<"good particle"<<endl;
+       // }
         for(Int_t i=0; i<NumHits; i++){
           ATHit *Hit = event->GetHit(i);
           TVector3 coords= Hit->GetPosition();
@@ -424,8 +425,8 @@ void run_plot0(Int_t runnum=21)
             }
             else{
               //depending on how x and y are assigned. this is for folding or unfolding the kinematics
-              x=trackVector.at(i).GetAngleZAxis()*TMath::RadToDeg();
-              y=trackVector.at(j).GetAngleZAxis()*TMath::RadToDeg();
+              y=trackVector.at(i).GetAngleZAxis()*TMath::RadToDeg();
+              x=trackVector.at(j).GetAngleZAxis()*TMath::RadToDeg();
             }
             //Q02_Kine->Fill(x,y);
             if((trackquads.at(i)+2)%4==trackquads.at(j)){
@@ -475,11 +476,11 @@ void run_plot0(Int_t runnum=21)
                 //  Q02_Kine->Fill(x,y);
               }
 
-              if(1==1){//!pidcut->IsInside(deltaE,totalE)){
+              if(pidcut->IsInside(deltaE,totalE)){
                 Q02_Kine->Fill(x,y);
-                if(y>50.0&&y<53.0){
-                cout<<evnt<<endl;
-              }
+                //if(y>50.0&&y<53.0){
+                //cout<<evnt<<endl;
+              //}
 
 
                 //PID->Fill(deltaE, totalE);
@@ -491,6 +492,7 @@ void run_plot0(Int_t runnum=21)
                 // }
                 if(wideElasticup->IsInside(x,y)){
                   PID->Fill(deltaE,totalE);
+                  cout<<evnt<<endl;
                   //Q02_Kine->Fill(x,y);
                   thetacm=180-(2*x);
                   if (thetacm<0) thetacm= thetacm+180.0;
@@ -500,7 +502,7 @@ void run_plot0(Int_t runnum=21)
                   if(index<=offset&&index>0){
                     energycm=(2.0/7.0)*(EnergyMM[offset-index]+(EnergyMM[offset-index]-EnergyMM[offset-index+1])*over);
                   }
-                  if(index>-500&&index<0){
+                  if(index>-1*offset&&index<0){
                     index=TMath::Abs(index);
                     energycm=(2.0/7.0)*(39.5+(EnergyMM[offset-index]+(EnergyMM[offset-index]-EnergyMM[offset-index+1])*over));
                     //myfile<<intVertex[0]<<"\t"<<energycm1<<index<<endl;

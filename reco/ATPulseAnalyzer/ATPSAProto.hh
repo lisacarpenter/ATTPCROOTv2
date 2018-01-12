@@ -6,6 +6,7 @@
 
 // ROOT classes
 #include "TSpectrum.h"
+#include "TRandom.h"
 
 class ATPSAProto : public ATPSA
 {

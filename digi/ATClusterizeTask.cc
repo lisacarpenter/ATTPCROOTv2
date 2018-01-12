@@ -117,7 +117,7 @@ ATClusterizeTask::Exec(Option_t* option)
          if(VolName == "drift_volume"){
            x                 = fMCPoint->GetXIn()*10; //mm
            y                 = fMCPoint->GetYIn()*10; //mm
-           z                 = 500-(fMCPoint->GetZIn()*10); //mm
+           z                 = 0.0-(fMCPoint->GetZIn()*10); //mm
            energyLoss_rec    =(fMCPoint -> GetEnergyLoss() )*1000;//MeV
            nElectrons        = int(floor(energyLoss_rec/fEIonize)); //mean electrons generated
            eFlux             = pow(fano*nElectrons, 0.5);//fluctuation of generated electrons

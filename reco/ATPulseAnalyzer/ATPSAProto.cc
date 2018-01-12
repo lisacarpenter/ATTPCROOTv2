@@ -46,8 +46,10 @@ ATPSAProto::Analyze(ATRawEvent *rawEvent, ATEvent *event)
       Bool_t fValidBuff = kTRUE;
       Bool_t fValidThreshold = kTRUE;
 
-    Double_t xPos     = pad -> GetPadXCoord();
-    Double_t yPos     = pad -> GetPadYCoord();
+    TRandom randGen;
+
+    Double_t xPos     = pad -> GetPadXCoord()+randGen.Uniform(-1.0,1.0);
+    Double_t yPos     = pad -> GetPadYCoord()+randGen.Uniform(-1.0,1.0);
     Double_t zPos     = 0;
     Double_t zPosCorr = 0.0;
     Double_t charge   = 0;
