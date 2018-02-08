@@ -52,7 +52,7 @@ void run_unpack_proto_10Be(TString dataFile = "10Be_2013_run_0021.txt",TString p
 	 decoderTask ->SetGeo(geo.Data());
    decoderTask ->SetProtoMap(protomapdir.Data());
    decoderTask ->SetMap((Char_t const*) scriptdir.Data());
-   decoderTask -> SetPersistence(kTRUE);
+   decoderTask -> SetPersistence(kFALSE);
    run -> AddTask(decoderTask);
 
    ATPSATask *psaTask = new ATPSATask();
@@ -92,8 +92,8 @@ void run_unpack_proto_10Be(TString dataFile = "10Be_2013_run_0021.txt",TString p
 */
    run->Init();
 
-  run->Run(0,2000);
-	//run -> RunOnTBData();
+  //run->Run(0,2000);
+	run -> RunOnTBData();
 
  // -----   Finish   -------------------------------------------------------
 	timer.Stop();

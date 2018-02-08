@@ -1,7 +1,8 @@
 *.swp
 *.root
 *.log
-10Be_2013_run_*.txt
+*.txt
+*.dat
 gphysi.dat
 core_dump*
 build

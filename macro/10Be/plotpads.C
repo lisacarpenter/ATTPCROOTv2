@@ -29,10 +29,10 @@ void plotpads()
 
   TH1D *meshSignal = new TH1D("MeshSignal","MeshSignal",512,0,512);
 
-  TH2D *Quad0 = new TH2D("Quad0", "Quad0",125,0,125,512,0,512);
-  TH2D *Quad1 = new TH2D("Quad1", "Quad1",125,0,125,512,0,512);
-  TH2D *Quad2 = new TH2D("Quad2", "Quad2",125,0,125,512,0,512);
-  TH2D *Quad3 = new TH2D("Quad3", "Quad3",125,0,125,512,0,512);
+  TH2D *Quad0 = new TH2D("Quad0", "Quad0",300,0,300,512,0,512);
+  TH2D *Quad1 = new TH2D("Quad1", "Quad1",300,0,300,512,0,512);
+  TH2D *Quad2 = new TH2D("Quad2", "Quad2",300,0,300,512,0,512);
+  TH2D *Quad3 = new TH2D("Quad3", "Quad3",300,0,300,512,0,512);
   Quad0->SetMarkerStyle(20);
   Quad0->SetMarkerSize(0.5);
   Quad1->SetMarkerStyle(20);
@@ -60,7 +60,7 @@ void plotpads()
     for(Int_t i=0;i<meshSignal->GetSize();i++){
       //meshSignal->SetBinContent(i,0.0);
     }
-    if(nEve==1944){
+    if(nEve==1943){
       std::vector<ATPad> *padVec=rawEvent->GetPads();
       cout<<padVec->size()<<endl;
       for(Int_t j=0;j<padVec->size();j++){
@@ -74,29 +74,24 @@ void plotpads()
             //cout<<x<<"\t"<<y<<"\t"<<k<<endl;
             if(y>0.0){
               if(x>0.0){
-                Quad0->Fill(TMath::Sqrt(x*x+y*y),k);
+                Quad0->SetBinContent(Quad0->FindBin(padVec->at(j).GetPadNum(),k),padVec->at(j).GetADC(k));
               }
               else{
-                Quad1->Fill(TMath::Sqrt(x*x+y*y),k);
+                Quad1->SetBinContent(Quad1->FindBin(padVec->at(j).GetPadNum(),k),padVec->at(j).GetADC(k));
               }
             }
             else{
               if(x>0.0){
-                Quad3->Fill(TMath::Sqrt(x*x+y*y),k);
+                Quad3->SetBinContent(Quad3->FindBin(padVec->at(j).GetPadNum(),k),padVec->at(j).GetADC(k));
               }
               else{
-                Quad2->Fill(TMath::Sqrt(x*x+y*y),k);
+                Quad2->SetBinContent(Quad2->FindBin(padVec->at(j).GetPadNum(),k),padVec->at(j).GetADC(k));
               }
             }
           }
         }
       }
-      // for(Int_t tb=1;tb<511;tb++){
-      //   Double_t a = meshSignal->GetBinContent(tb-1);
-      //   Double_t b = meshSignal->GetBinContent(tb);
-      //   Double_t c = meshSignal->GetBinContent(tb+1);
-      //   meshSignal->SetBinContent(tb, (c-a)/2);
-      // }
+     break;
     }
 
     nEve++;
@@ -105,12 +100,12 @@ void plotpads()
   meshSignal->Draw();
 
    c3->cd(1);
-   Quad0->Draw();
+   Quad0->Draw("colz");
    c3->cd(2);
-   Quad1->Draw();
+   Quad1->Draw("colz");
    c3->cd(3);
-   Quad2->Draw();
+   Quad2->Draw("colz");
    c3->cd(4);
-   Quad3->Draw();
+   Quad3->Draw("colz");
 
 }

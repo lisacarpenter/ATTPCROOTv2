@@ -753,11 +753,11 @@ void ATRANSACN::ATRansac::vertex_lisa(std::vector<ATTrack*> tracks) {
 
           xv = (x+xp)/2.;
           yv = (y+yp)/2.;
-          zv = (z+zp)/2.;
+          zv = (z+zp)/2.+40.0;//correcting for apparent offset
           rv = sqrt(pow(xv,2)+pow(yv,2));
 
           linedist=sqrt(pow((x-xp),2) + pow((y-yp),2) + pow((z-zp),2));
-          if(rv<50.0&&zv>0&&zv<500&&linedist<fLineDistThreshold){
+          if(linedist<fLineDistThreshold){//&&rv<50.0&&zv>0&&zv<500){
             fVertex_1.SetXYZ(x,y,z);
             fVertex_2.SetXYZ(xp,yp,zp);
             fVertex_mean.SetXYZ(xv,yv,zv);

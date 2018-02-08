@@ -634,10 +634,10 @@ ATEventDrawTaskProto::DrawPadAll()
         //fPadAll[i] = new TH1I("fPadAll","fPadAll",512,0,511);
         fPadAll[i]->GetYaxis()->SetRangeUser(-500,2500);
         // TODO: make it pad number independent / retrieve the quadrant info
-        if (i>=12&&i<25) fPadAll[i]->SetLineColor(6);                         // Q1, pink
-        else if(i>=64 && i<127) fPadAll[i]->SetLineColor(8);           // Q2, green
-        else if(i>=127 && i<190) fPadAll[i]->SetLineColor(7);           // Q3, blue
-        else if(i>=190 && i<253) fPadAll[i]->SetLineColor(kOrange-3);   // Q4, orange
+        if (i>=0&&i<64) fPadAll[i]->SetLineColor(kRed);                         // Q1, red
+        else if(i>=64 && i<127) fPadAll[i]->SetLineColor(kGreen);           // Q2, green
+        else if(i>=127 && i<190) fPadAll[i]->SetLineColor(kBlue);           // Q3, blue
+        else if(i>=190 && i<253) fPadAll[i]->SetLineColor(kYellow);   // Q4, yellow
         else fPadAll[i]->SetLineColor(0);                              //white for non physical pads
         fPadAll[i] -> Draw("SAME");
 
