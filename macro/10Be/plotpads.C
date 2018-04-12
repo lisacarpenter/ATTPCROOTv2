@@ -42,7 +42,7 @@ void plotpads()
   Quad3->SetMarkerStyle(20);
   Quad3->SetMarkerSize(0.5);
 
-  TString FileName = "allpads/10Be_2013_run0021.root";
+  TString FileName = "output_sim.root";
   std::cout<<" Opening File : "<<FileName.Data()<<std::endl;
   TFile* file = new TFile(FileName.Data(),"READ");
 
@@ -53,20 +53,20 @@ void plotpads()
   TTreeReader Reader1("cbmsim", file);
   TTreeReaderValue<TClonesArray> rawEventArray(Reader1, "ATRawEvent");
 
-  Double_t threshold = 75.0;
+  Double_t threshold = 20.0;
   Int_t nEve=0;
   while (Reader1.Next()) {
     ATRawEvent* rawEvent = (ATRawEvent*) rawEventArray->At(0);
     for(Int_t i=0;i<meshSignal->GetSize();i++){
       //meshSignal->SetBinContent(i,0.0);
     }
-    if(nEve==1943){
+    if(nEve==1975){
       std::vector<ATPad> *padVec=rawEvent->GetPads();
       cout<<padVec->size()<<endl;
       for(Int_t j=0;j<padVec->size();j++){
         for(Int_t k=0;k<512;k++){
           if(padVec->at(j).GetADC(k)>10)meshSignal->AddBinContent(meshSignal->FindBin(k),padVec->at(j).GetADC(k));
-          if(padVec->at(j).GetADC(k)>10)cout<<padVec->at(j).GetPadNum()<<"\t"<<k<<"\t"<<padVec->at(j).GetADC(k)<<endl;
+          //if(padVec->at(j).GetADC(k)>10)cout<<padVec->at(j).GetPadNum()<<"\t"<<k<<"\t"<<padVec->at(j).GetADC(k)<<endl;
           //cout<<meshSignal->GetBinContent(k)<<endl;
           if(padVec->at(j).GetADC(k)>threshold){
             Double_t x = padVec->at(j).GetPadXCoord();

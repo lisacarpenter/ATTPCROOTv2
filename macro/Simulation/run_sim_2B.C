@@ -1,4 +1,4 @@
-void run_sim_2B(Int_t nEvents = 16000, TString mcEngine = "TGeant4")
+void run_sim_2B(Int_t nEvents = 1, TString mcEngine = "TGeant4")
 {
 
   TString dir = getenv("VMCWORKDIR");
@@ -75,10 +75,10 @@ void run_sim_2B(Int_t nEvents = 16000, TString mcEngine = "TGeant4")
 	        Int_t m = 1;   // Multiplicity  NOTE: Due the limitation of the TGenPhaseSpace accepting only pointers/arrays the maximum multiplicity has been set to 10 particles.
 	        Double_t px = 0.000/a;  // X-Momentum / per nucleon!!!!!!
 	        Double_t py = 0.000/a;  // Y-Momentum / per nucleon!!!!!!
-	        Double_t pz = 0.8016/a;  // Z-Momentum / per nucleon!!!!!!
+	        Double_t pz = 0.895/a;  // Z-Momentum / per nucleon!!!!!!
   	        Double_t BExcEner = 0.0;
                 Double_t Bmass = 9.3; //Mass in GeV
-                Double_t NomEnergy = 39.5; //Nominal Energy of the beam: Only used for cross section calculation (Tracking energy is determined with momentum). TODO: Change this to the energy after the IC
+                Double_t NomEnergy = 45.0; //Nominal Energy of the beam: Only used for cross section calculation (Tracking energy is determined with momentum). TODO: Change this to the energy after the IC
                 Double_t TargetMass = 3.72;//Mass in GeV
 
 

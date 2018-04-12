@@ -753,7 +753,7 @@ void ATRANSACN::ATRansac::vertex_lisa(std::vector<ATTrack*> tracks) {
 
           xv = (x+xp)/2.;
           yv = (y+yp)/2.;
-          zv = (z+zp)/2.+40.0;//correcting for apparent offset
+          zv = (z+zp)/2.;
           rv = sqrt(pow(xv,2)+pow(yv,2));
 
           linedist=sqrt(pow((x-xp),2) + pow((y-yp),2) + pow((z-zp),2));

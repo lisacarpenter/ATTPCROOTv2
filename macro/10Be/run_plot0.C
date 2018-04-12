@@ -93,10 +93,50 @@ TGraph2D *line3d(std::vector<Double_t> parFit ){
   return graph;
 }
 
-void run_plot0(Int_t runnum=21)
+void run_plot0(Int_t runnum=21,Int_t viewEvent = 75)
 {
+
+  //filing in theoretical kinematic lines...
   TString FileNameHead = "output_proto";
   TString fileKine="../Kinematics/Decay_kinematics/10Be_4He_19MeV.txt";
+  Double_t *ThetaCMS = new Double_t[20000];
+  Double_t *ThetaLabRec = new Double_t[20000];
+  Double_t *EnerLabRec = new Double_t[20000];
+  Double_t *ThetaLabSca = new Double_t[20000];
+  Double_t *EnerLabSca = new Double_t[20000];
+  Double_t *ThetaCMSIn = new Double_t[1800];
+  Double_t *ThetaLabRecIn = new Double_t[1800];
+  Double_t *EnerLabRecIn = new Double_t[1800];
+  Double_t *ThetaLabScaIn = new Double_t[1800];
+  Double_t *EnerLabScaIn = new Double_t[1800];
+
+
+  std::ifstream *kineStr = new std::ifstream(fileKine.Data());
+  Int_t numKin=0;
+
+  if(!kineStr->fail()){
+    while(!kineStr->eof()){
+      *kineStr>>ThetaCMS[numKin]>>ThetaLabRec[numKin]>>EnerLabRec[numKin]>>ThetaLabSca[numKin]>>EnerLabSca[numKin];
+      numKin++;
+    }
+  }else if(kineStr->fail()) std::cout<<" Warning : No Kinematics file found for this reaction! Please run the macro on $SIMPATH/macro/Kinematics/Decay_kinematics/Mainrel.cxx"<<std::endl;
+  TGraph *Kine_AngRec_AngSca = new TGraph(numKin,ThetaLabRec,ThetaLabSca);
+  TGraph *Kine_AngRec_AngSca_vert = new TGraph(numKin,ThetaLabSca,ThetaLabRec);
+
+
+  TString kinfileIn = "KineInEl.txt";
+  std::ifstream *kineStrIn = new std::ifstream(kinfileIn.Data());
+  numKin=0;
+
+  if(!kineStrIn->fail()){
+    while(!kineStrIn->eof()){
+      *kineStrIn>>ThetaCMSIn[numKin]>>ThetaLabRecIn[numKin]>>EnerLabRecIn[numKin]>>ThetaLabScaIn[numKin]>>EnerLabScaIn[numKin];
+      numKin++;
+    }
+  }else if(kineStrIn->fail()) std::cout<<" Warning : No Kinematics file found for this reaction! Please run the macro on $SIMPATH/macro/Kinematics/Decay_kinematics/Mainrel.cxx"<<std::endl;
+  TGraph *Kine_AngRec_AngSca_In = new TGraph(numKin,ThetaLabRecIn,ThetaLabScaIn);
+  TGraph *Kine_AngRec_AngSca_In_vert = new TGraph(numKin,ThetaLabScaIn,ThetaLabRecIn);
+
   TCanvas *c2 = new TCanvas("c2","c2",200,10,700,700);
   c2->Divide(2,1);
   TCanvas *c3 = new TCanvas("c3","c3",200,10,700,700);
@@ -104,7 +144,7 @@ void run_plot0(Int_t runnum=21)
   TCanvas *c4 = new TCanvas("c4","c4",200,10,700,700);
   TCanvas *c5 = new TCanvas("c5","c5",200,10,700,700);
   c5->Divide(2,1);
-  TCanvas *c6 = new TCanvas("c6","c6",200,10,700,700);
+  TCanvas *c6 = new TCanvas("c6","c6",1000,500);
   c6->Divide(2,1);
 
   TH2D* Q02_Kine = new TH2D("Q02_Kine","Q02_Kine",180,0,180,180,0,180);
@@ -116,8 +156,8 @@ void run_plot0(Int_t runnum=21)
   Q13_Kine->SetMarkerStyle(20);
   Q13_Kine->SetMarkerSize(0.7);
 
-  TH1D* Vertex = new TH1D("Vertex","Vertex",1000,0,500000);
-  TH1D* Vertex1 = new TH1D("Vertex1","Vertex1",10,0,10);
+  TH1D* Vertex = new TH1D("Vertex","Vertex",600,0,600);
+  TH1D* Vertex1 = new TH1D("Vertex1","Vertex1",600,0,600);
   TH2D* Vertex_vs_Angle = new TH2D("Vertex_vs_Angle","Vertex_vs_Angle",2000,-1000,1000,600,0,600);
 
   TH2D* PID = new TH2D("PID","PID",100,0,10000,100,0,500000);
@@ -125,7 +165,7 @@ void run_plot0(Int_t runnum=21)
   TH2D* PhiCompare = new TH2D("PhiCompare","PhiCompare",180,0,90,180,0,90);
   TH1D* PhiCompare1 = new TH1D("PhiCompare1","PhiCompare1",500,-500,500);
 
-  TH3D* trackpic = new TH3D("trackpic","trackpic",300,-150,150,300,-150,150,500,0,500);
+  TH3D* trackpic = new TH3D("trackpic","trackpic",300,-150,150,300,-150,150,1000,0,1000);
   trackpic->SetMarkerColor(2);
   trackpic->SetMarkerStyle(20);
   trackpic->SetMarkerSize(0.7);
@@ -135,8 +175,8 @@ void run_plot0(Int_t runnum=21)
   dalitz->SetMarkerStyle(20);
   dalitz->SetMarkerSize(0.7);
 
-  TH2D* Excitation_EL = new TH2D("Elastic", "Elastic",150,0,15,150,0,15);
-  TH2D* Excitation_IN = new TH2D("Inelastic", "Inelastic",36,0,180,120,0,12);
+  TH2D* Excitation_EL = new TH2D("Elastic", "Elastic",180,0,180,75,0,15);
+  TH2D* Excitation_IN = new TH2D("Inelastic", "Inelastic",180,0,180,75,0,15);
 
   TCutG* wideElasticup = new TCutG("wideElasticup",20);
   //elastic cut for "folded" kinematics
@@ -166,6 +206,9 @@ void run_plot0(Int_t runnum=21)
   wideElasticup->SetPoint(19,90,2);
   wideElasticup->SetPoint(20,90,-2);
 
+  TCutG* inelasticcut = new TCutG("inelastic",numKin,ThetaLabRecIn,ThetaLabScaIn);
+
+
   TCutG* pidcut = new TCutG("pidcut",5);
   pidcut->SetVarX("dE");
   pidcut->SetVarY("E");
@@ -181,22 +224,25 @@ void run_plot0(Int_t runnum=21)
   cut1->SetVarX("Evertex");
   cut1->SetVarY("Etracks");
   cut1->SetTitle("small");
-  cut1->SetPoint(0,11.07,12.28);
-  cut1->SetPoint(1,8.20,9.62);
-  cut1->SetPoint(2,8.63,8.96);
-  cut1->SetPoint(3,11.15,10.76);
-  cut1->SetPoint(4,11.07,12.28);
+  cut1->SetPoint(0,12.0,12.5);
+  cut1->SetPoint(1,2.4,3.4);
+  cut1->SetPoint(2,2.8,2.9);
+  cut1->SetPoint(3,12.0,11.7);
+  cut1->SetPoint(4,12.0,12.5);
 
   TCutG* cut2 = new TCutG("cut2",4);
   cut2->SetVarX("Evertex");
   cut2->SetVarY("Etracks");
   cut2->SetTitle("large");
-  cut2->SetPoint(0,10.98,13.18);
-  cut2->SetPoint(1,3.19,7.05);
-  cut2->SetPoint(2,3.26,6.44);
-  cut2->SetPoint(3,11.10,12.21);
-  cut2->SetPoint(4,10.98,13.18);
+  cut2->SetPoint(0,12.0,11.7);
+  cut2->SetPoint(1,7.8,7.3);
+  cut2->SetPoint(2,8.3,6.8);
+  cut2->SetPoint(3,12.0,9.9);
+  cut2->SetPoint(4,12.0,11.7);
 
+  Double_t corra[2] = {0.0,0.0};
+  Double_t corrb[2] = {15.0,15.0};
+  TGraph *corr = new TGraph(2,corra,corrb);
 
   Double_t *AlphaEnTab = new Double_t[100];
   Double_t *AlphaRangeTab = new Double_t[100];
@@ -217,7 +263,124 @@ void run_plot0(Int_t runnum=21)
     numBe++;
   }
 
-  Int_t viewEvent = 4309; //choose which event to view
+  Double_t *enlist15 = new Double_t[100];
+  Double_t *enlist18 = new Double_t[100];
+  Double_t *enlist20 = new Double_t[100];
+  Double_t *enlist23 = new Double_t[100];
+  Double_t *enlist25 = new Double_t[100];
+  Double_t *enlist28 = new Double_t[100];
+  Double_t *enlist30 = new Double_t[100];
+  Double_t *enlist33 = new Double_t[100];
+  Double_t *enlist35 = new Double_t[100];
+  Double_t *enlist38 = new Double_t[100];
+  Double_t *enlist40 = new Double_t[100];
+  Double_t *enlist43 = new Double_t[100];
+  Double_t *enlist45 = new Double_t[100];
+  Double_t *anglist15 = new Double_t[100];
+  Double_t *anglist18 = new Double_t[100];
+  Double_t *anglist20 = new Double_t[100];
+  Double_t *anglist23 = new Double_t[100];
+  Double_t *anglist25 = new Double_t[100];
+  Double_t *anglist28 = new Double_t[100];
+  Double_t *anglist30 = new Double_t[100];
+  Double_t *anglist33 = new Double_t[100];
+  Double_t *anglist35 = new Double_t[100];
+  Double_t *anglist38 = new Double_t[100];
+  Double_t *anglist40 = new Double_t[100];
+  Double_t *anglist43 = new Double_t[100];
+  Double_t *anglist45 = new Double_t[100];
+
+  std::ifstream *table15 = new std::ifstream("inelE15.txt");
+  Int_t num15 = 0;
+  while(num15<100){
+    *table15>>enlist15[num15]>>anglist15[num15];
+    num15++;
+  }
+
+  std::ifstream *table18 = new std::ifstream("inelE18.txt");
+  Int_t num18 = 0;
+  while(num18<100){
+    *table18>>enlist18[num18]>>anglist18[num18];
+    num18++;
+  }
+
+  std::ifstream *table20 = new std::ifstream("inelE20.txt");
+  Int_t num20 = 0;
+  while(num20<100){
+    *table20>>enlist20[num20]>>anglist20[num20];
+    num20++;
+  }
+
+  std::ifstream *table23 = new std::ifstream("inelE23.txt");
+  Int_t num23 = 0;
+  while(num23<100){
+    *table23>>enlist23[num23]>>anglist23[num23];
+    num23++;
+  }
+
+  std::ifstream *table25 = new std::ifstream("inelE25.txt");
+  Int_t num25 = 0;
+  while(num25<100){
+    *table25>>enlist25[num25]>>anglist25[num25];
+    num25++;
+  }
+
+  std::ifstream *table28 = new std::ifstream("inelE28.txt");
+  Int_t num28 = 0;
+  while(num28<100){
+    *table28>>enlist28[num28]>>anglist28[num28];
+    num28++;
+  }
+
+  std::ifstream *table30 = new std::ifstream("inelE30.txt");
+  Int_t num30 = 0;
+  while(num30<100){
+    *table30>>enlist30[num30]>>anglist30[num30];
+    num30++;
+  }
+
+  std::ifstream *table33 = new std::ifstream("inelE33.txt");
+  Int_t num33 = 0;
+  while(num33<100){
+    *table33>>enlist33[num33]>>anglist33[num33];
+    num33++;
+  }
+
+  std::ifstream *table35 = new std::ifstream("inelE35.txt");
+  Int_t num35 = 0;
+  while(num35<100){
+    *table35>>enlist35[num35]>>anglist35[num35];
+    num35++;
+  }
+
+  std::ifstream *table38 = new std::ifstream("inelE38.txt");
+  Int_t num38 = 0;
+  while(num38<100){
+    *table38>>enlist38[num38]>>anglist38[num38];
+    num38++;
+  }
+
+  std::ifstream *table40 = new std::ifstream("inelE40.txt");
+  Int_t num40 = 0;
+  while(num40<100){
+    *table40>>enlist40[num40]>>anglist40[num40];
+    num40++;
+  }
+
+  std::ifstream *table43 = new std::ifstream("inelE43.txt");
+  Int_t num43 = 0;
+  while(num43<100){
+    *table43>>enlist43[num43]>>anglist43[num43];
+    num43++;
+  }
+
+  std::ifstream *table45 = new std::ifstream("inelE45.txt");
+  Int_t num45 = 0;
+  while(num45<100){
+    *table45>>enlist45[num45]>>anglist45[num45];
+    num45++;
+  }
+
 
   TVector3 zero;
   zero.SetX(0.0);
@@ -233,7 +396,7 @@ void run_plot0(Int_t runnum=21)
   }
   Double_t energycm;
   Double_t thetacm;
-  Int_t offset = 500;//"true" detector entrance position. currently 500 because everything recalibrated already
+  Int_t offset = 460;//"true" detector entrance position.
   Double_t maxchi2=50.0;
   std::vector<TPolyLine3D*> tracksGraph;
   std::vector<Int_t> trackquads;
@@ -265,6 +428,7 @@ void run_plot0(Int_t runnum=21)
   Double_t maxmesh=0;
   Int_t    maxmeshpos=0;
   Double_t meshthresh=200;
+  Bool_t is2B=kFALSE;
   ofstream myfile;
   myfile.open ("stuff.txt");
 
@@ -273,7 +437,7 @@ void run_plot0(Int_t runnum=21)
   TFileCollection *filecol = new TFileCollection();
   TString FileNameHead_num;
   TString FileNameHead_chain;
-  TString FilePath = workdir + "/macro/10Be/";
+  TString FilePath = workdir + "/macro/10Be/sim/";
   TString FileNameTail = ".root";
   TString FileName     = FilePath + FileNameHead + FileNameTail;
   Int_t file_ini=runnum;
@@ -307,12 +471,28 @@ void run_plot0(Int_t runnum=21)
       ATEvent* event = (ATEvent*) eventArray->At(0);
       ATProtoEvent* protoevent = (ATProtoEvent*) protoeventArray->At(0);
       std::vector<ATTrack> trackVector = ransac->GetTrackCand();
-      std::vector<ATRANSACN::ATRansac::PairedLines> plines = ransac->GetPairedLinesArray();
       Float_t *MeshArray              = event->GetMesh();
       Int_t NumHits                   = event->GetNumHits();
       std::vector<ATProtoQuadrant> *quadvec   = protoevent->GetQuadrantArray();
+      deltaE=0;
+      for(Int_t i=512;i>0;i--){
+        if(MeshArray[i]>meshthresh){
+          Vertex->Fill(i);
+          deltaE=i;
+          break;
+        }
+      }
 
-      if(evnt==viewEvent)cout<<trackVector.size()<<endl;
+      for(Int_t i=512;i>0;i--){
+        if(MeshArray[i]>5*meshthresh){
+          Vertex1->Fill(i);
+          //deltaE=i;
+          break;
+        }
+      }
+
+
+      //if(evnt==viewEvent)cout<<trackVector.size()<<endl;
       RedChi2.clear();
       trackquads.clear();
       maxrad.clear();
@@ -390,7 +570,6 @@ void run_plot0(Int_t runnum=21)
           maxradvec.erase(maxradvec.begin()+i);
         }
         else if((trackhits->size()/2)<=numgood.at(i).size()){
-          //if(evnt==viewEvent)cout<<trackhits->size()<<"\t"<<numgood.at(i).size()<<endl;
           //if more than half the points in a track also fit with a different track, remove it
           for(Int_t j=0;j<numgood.at(i).size();j++){
             //store the removed points in order to make range calculation
@@ -414,15 +593,16 @@ void run_plot0(Int_t runnum=21)
           maxrad.erase(maxrad.begin()+i);
           maxradvec.erase(maxradvec.begin()+i);
         }
-        else if(vertexrad>125.0){//}||vertexcoords.z()>500.0||vertexcoords.z()<0){
-          //remove tracks with non-physical vertex radii
-          trackVector.erase(trackVector.begin()+i);
-          RedChi2.erase(RedChi2.begin()+i);
-          trackquads.erase(trackquads.begin()+i);
-          numgood.erase(numgood.begin()+i);
-          numspark.erase(numspark.begin()+i);
-          maxrad.erase(maxrad.begin()+i);
-        }
+        // else if(vertexrad>125.0||vertexcoords.z()>offset||vertexcoords.z()<offset-500.0){
+        //   //remove tracks with non-physical vertex
+        //   trackVector.erase(trackVector.begin()+i);
+        //   RedChi2.erase(RedChi2.begin()+i);
+        //   trackquads.erase(trackquads.begin()+i);
+        //   numgood.erase(numgood.begin()+i);
+        //   numspark.erase(numspark.begin()+i);
+        //   maxrad.erase(maxrad.begin()+i);
+        //   maxradvec.erase(maxradvec.begin()+i);
+        // }
         else{
           i++;
         }
@@ -466,10 +646,11 @@ void run_plot0(Int_t runnum=21)
         // TVector3 coords=trackhits->at(j).GetPosition();
         // trackpic->Fill(coords.x(),coords.y(),coords.z());
         // cout<<coords.x()<<"\t"<<coords.y()<<"\t"<<coords.z()<<endl;
-        //}
-        //cout<<RedChi2.at(i)<<"\t"<<trackVector.at(i).GetNFree()<<endl;
-        TPolyLine3D *dummy = new TPolyLine3D(1000);
-        TPolyLine *dummy2d = new TPolyLine(1000);
+        // }
+        cout<<RedChi2.at(i)<<"\t"<<trackhits->size()<<endl;
+        cout<<trackVector.at(i).GetAngleZAxis()*TMath::RadToDeg()<<endl;
+        TPolyLine3D *dummy = new TPolyLine3D(2);
+        TPolyLine *dummy2d = new TPolyLine(2);
         for (int j = 210; j<1210;++j){
           double t = j-210;
           double x,y,z,r;
@@ -487,15 +668,19 @@ void run_plot0(Int_t runnum=21)
         tracksGraph.push_back(dummy);
       }
       //uncomment break statement below if the only point is viewing
-      //break;
+      break;
     }
-
-    if(trackVector.size()>1){
+    is2B=kFALSE;
+    std::vector<Double_t> *Phi0Array;
+    std::vector<Double_t> *Phi0RArray;
+    std::vector<Double_t> *Phi2Array;
+    std::vector<Double_t> *Phi2RArray;
+    if(trackVector.size()>1&&deltaE>370&&deltaE<400){
       for(Int_t i=0;i<trackVector.size();i++){
         for(Int_t j=i+1;j<trackVector.size();j++){
           vertexi = trackVector.at(i).GetTrackVertex();
           vertexj = trackVector.at(j).GetTrackVertex();
-          vertexmean = 1/2.0*(vertexi+vertexj);
+          vertexmean = 1.0/2.0*(vertexi+vertexj);
           Double_t vertexmeanrad = TMath::Sqrt(vertexmean.x()*vertexmean.x()+vertexmean.y()*vertexmean.y());
           if(trackVector.at(i).GetAngleZAxis()>trackVector.at(j).GetAngleZAxis()){
             //assigning alpha and beryllium angles
@@ -504,22 +689,24 @@ void run_plot0(Int_t runnum=21)
             //calculating alpha and beryllium track lengths
             lengtha=(maxradvec[i]-vertexmean).Mag();
             lengthb=(maxradvec[j]-vertexmean).Mag();
+            //lengtha=(maxrad[i]-TMath::Sqrt(vertexmean.x()*vertexmean.x()+vertexmean.y()*vertexmean.y()))/TMath::Sin(trackVector.at(i).GetAngleZAxis());
+            //lengthb=(maxrad[j]-TMath::Sqrt(vertexmean.x()*vertexmean.x()+vertexmean.y()*vertexmean.y()))/TMath::Sin(trackVector.at(j).GetAngleZAxis());
           }
           else{
             angleb=trackVector.at(i).GetAngleZAxis()*TMath::RadToDeg();
             anglea=trackVector.at(j).GetAngleZAxis()*TMath::RadToDeg();
             //lengthb=(maxrad[i]-TMath::Sqrt(vertexmean.x()*vertexmean.x()+vertexmean.y()*vertexmean.y()))/TMath::Sin(trackVector.at(i).GetAngleZAxis());
-            //lengtha=(maxrad[j]-TMath::Sqrt(vertexmean.x()*vertexmean.x()+vertexmean.y()*vertexmean.y()))/TMath::Sin(trackVector.at(i).GetAngleZAxis());
+            //lengtha=(maxrad[j]-TMath::Sqrt(vertexmean.x()*vertexmean.x()+vertexmean.y()*vertexmean.y()))/TMath::Sin(trackVector.at(j).GetAngleZAxis());
             lengthb=(maxradvec[i]-vertexmean).Mag();
             lengtha=(maxradvec[j]-vertexmean).Mag();
           }
           //Q02_Kine->Fill(x,y);
           if((trackquads.at(i)+2)%4==trackquads.at(j)){
             //array of the phi and the phi radius for the two relevant quadrants
-            std::vector<Double_t> *Phi0Array =quadvec->at(trackquads.at(i)).GetPhiArray();
-            std::vector<Double_t> *Phi0RArray =quadvec->at(trackquads.at(i)).GetPhiRArray();
-            std::vector<Double_t> *Phi2Array =quadvec->at(trackquads.at(j)).GetPhiArray();
-            std::vector<Double_t> *Phi2RArray =quadvec->at(trackquads.at(j)).GetPhiRArray();
+            Phi0Array =quadvec->at(trackquads.at(i)).GetPhiArray();
+            Phi0RArray =quadvec->at(trackquads.at(i)).GetPhiRArray();
+            Phi2Array =quadvec->at(trackquads.at(j)).GetPhiArray();
+            Phi2RArray =quadvec->at(trackquads.at(j)).GetPhiRArray();
             if(trackquads.at(i)<trackquads.at(j)){
               //assign x and y coordinates of kinematic plot based on quadrants
               x=trackVector.at(i).GetAngleZAxis()*TMath::RadToDeg();
@@ -592,98 +779,281 @@ void run_plot0(Int_t runnum=21)
             Double_t ena = moma*moma/(2.0*4000.0);//energy alpha
             //ena=AlphaEnTab[bestindex]+(AlphaEnTab[bestindex+1]-AlphaEnTab[bestindex])*(lengtha-bestrange)/(AlphaRangeTab[bestindex+1]-bestrange); //option for calcluating alpha energy directly
 
+            Int_t index=int(floor(vertexmean.z()));
+            Double_t over = (vertexmean.z())-index;
+            index = offset-index;
+            if(index<=500&&index>0){
+              energycm=2.0/7.0*(EnergyMM[index]+(EnergyMM[index]-EnergyMM[index+1])*over);
+            }
+            if(index>-500&&index<0){
+              index=500+index;
+              energycm=2.0/7.0*(44.0+(EnergyMM[index]+(EnergyMM[index]-EnergyMM[index+1])*over));
+              //myfile<<intVertex[0]<<"\t"<<energycm1<<index<<endl;
+            }
             Q02_Kine->Fill(x,y);
-            if(wideElasticup->IsInside(anglea,angleb)){
+            if(TMath::Abs(wideElasticup->IsInside(anglea,angleb))){//}&&TMath::Abs(energycm-2.0/7.0*(ena+enb))<0.5)){
+              is2B=kTRUE;
               PID->Fill(deltaE,totalE);
               thetacm=180-(2*anglea);
               if (thetacm<0) thetacm= thetacm+180.0;
               //calculating the energy from the center of mass position
-              Int_t index=int(floor(vertexmean.z()));
-              Double_t over = (vertexmean.z())-index;
-              if(index<=offset&&index>0){
-                energycm=(2.0/7.0)*(EnergyMM[offset-index]+(EnergyMM[offset-index]-EnergyMM[offset-index+1])*over);
-              }
-              if(index>-1*offset&&index<0){
-                index=TMath::Abs(index);
-                energycm=(2.0/7.0)*(39.5+(EnergyMM[offset-index]+(EnergyMM[offset-index]-EnergyMM[offset-index+1])*over));
-                //myfile<<intVertex[0]<<"\t"<<energycm1<<index<<endl;
-              }
+
               if(1==1){//TMath::Abs(avg(Phi0Array)-avg(Phi2Array))<15.0){ //not currently cutting on phi, resolution not good enough
-                Excitation_EL->Fill(energycm, 2.0/7.0*(ena+enb)); //resolution plot
-                Excitation_IN->Fill(thetacm,energycm); //excitation function, elastic
+                //Excitation_EL->Fill(energycm, 2.0/7.0*(ena+enb)); //resolution plot
+                Excitation_EL->Fill(thetacm,energycm); //excitation function, elastic
+            //    if(cut1->IsInside(energycm, 2.0/7.0*(ena+enb))){
+            //    Q02_Kine->Fill(x,y);
+            //   }
+            //   if(cut2->IsInside(energycm, 2.0/7.0*(ena+enb))){
+            //   Q13_Kine->Fill(x,y);
+            // }
 
-
-              }
-            }
           }
         }
-      }
+        if(inelasticcut->IsInside(anglea,angleb)&&TMath::Abs(2.0/7.0*(ena+enb+3.36803)-energycm)<0.5){
+          is2B=kTRUE;
+          //Vertex1->Fill(enb);
+
+          Double_t energylab = 7.0/2.0*energycm;
+          Double_t thetalow=0.0;
+          Double_t thetahigh=0.0;
+          if(energylab>=43.0&&energylab<45.0){
+            for(Int_t i=0;i<100;i++){
+              if(enb>=enlist43[i]){
+                thetalow=anglist43[i]+(anglist43[i+1]-anglist43[i])*(enb-enlist43[i])/(enlist43[i+1]-enlist43[i]);
+                break;
+              }
+            }
+            for(Int_t i=0;i<100;i++){
+              if(enb>=enlist45[i]){
+                thetahigh=anglist45[i]+(anglist45[i+1]-anglist45[i])*(enb-enlist45[i])/(enlist45[i+1]-enlist45[i]);
+                break;
+              }
+            }
+            thetacm = thetalow + (thetahigh-thetalow)*(energylab-43.0)/(45.0-43.0);
+          }
+          if(energylab>=40.0&&energylab<43.0){
+            for(Int_t i=0;i<100;i++){
+              if(enb>=enlist40[i]){
+                thetalow=anglist40[i]+(anglist40[i+1]-anglist40[i])*(enb-enlist40[i])/(enlist40[i+1]-enlist40[i]);
+                break;
+              }
+            }
+            for(Int_t i=0;i<100;i++){
+              if(enb>=enlist43[i]){
+                thetahigh=anglist43[i]+(anglist43[i+1]-anglist43[i])*(enb-enlist43[i])/(enlist43[i+1]-enlist43[i]);
+                break;
+              }
+            }
+            thetacm = thetalow + (thetahigh-thetalow)*(energylab-40.0)/(43.0-40.0);
+          }
+          else if(energylab>=38.0&&energylab<40.0){
+            for(Int_t i=0;i<100;i++){
+              if(enb>=enlist38[i]){
+                thetalow=anglist38[i]+(anglist38[i+1]-anglist38[i])*(enb-enlist38[i])/(enlist38[i+1]-enlist38[i]);
+                break;
+              }
+            }
+            for(Int_t i=0;i<100;i++){
+              if(enb>=enlist40[i]){
+                thetahigh=anglist40[i]+(anglist40[i+1]-anglist40[i])*(enb-enlist40[i])/(enlist40[i+1]-enlist40[i]);
+                break;
+              }
+            }
+            thetacm = thetalow + (thetahigh-thetalow)*(energylab-38.0)/(40.0-38.0);
+          }
+          else if(energylab>=35.0&&energylab<38.0){
+            for(Int_t i=0;i<100;i++){
+              if(enb>=enlist35[i]){
+                thetalow=anglist35[i]+(anglist35[i+1]-anglist35[i])*(enb-enlist35[i])/(enlist35[i+1]-enlist35[i]);
+                break;
+              }
+            }
+            for(Int_t i=0;i<100;i++){
+              if(enb>=enlist38[i]){
+                thetahigh=anglist38[i]+(anglist38[i+1]-anglist38[i])*(enb-enlist38[i])/(enlist38[i+1]-enlist38[i]);
+                break;
+              }
+            }
+            thetacm = thetalow + (thetahigh-thetalow)*(energylab-35.0)/(38.0-35.0);
+          }
+          else if(energylab>=33.0&&energylab<35.0){
+            for(Int_t i=0;i<100;i++){
+              if(enb>=enlist33[i]){
+                thetalow=anglist33[i]+(anglist33[i+1]-anglist33[i])*(enb-enlist33[i])/(enlist33[i+1]-enlist33[i]);
+                break;
+              }
+            }
+            for(Int_t i=0;i<100;i++){
+              if(enb>=enlist35[i]){
+                thetahigh=anglist35[i]+(anglist35[i+1]-anglist35[i])*(enb-enlist35[i])/(enlist35[i+1]-enlist35[i]);
+                break;
+              }
+            }
+            thetacm = thetalow + (thetahigh-thetalow)*(energylab-33.0)/(35.0-33.0);
+          }
+          else if(energylab>=30.0&&energylab<33.0){
+            for(Int_t i=0;i<100;i++){
+              if(enb>=enlist30[i]){
+                thetalow=anglist30[i]+(anglist30[i+1]-anglist30[i])*(enb-enlist30[i])/(enlist30[i+1]-enlist30[i]);
+                break;
+              }
+            }
+            for(Int_t i=0;i<100;i++){
+              if(enb>=enlist33[i]){
+                thetahigh=anglist33[i]+(anglist33[i+1]-anglist33[i])*(enb-enlist33[i])/(enlist33[i+1]-enlist33[i]);
+                break;
+              }
+            }
+            thetacm = thetalow + (thetahigh-thetalow)*(energylab-30.0)/(33.0-30.0);
+          }
+          else if(energylab>=28.0&&energylab<30.0){
+            for(Int_t i=0;i<100;i++){
+              if(enb>=enlist28[i]){
+                thetalow=anglist28[i]+(anglist28[i+1]-anglist28[i])*(enb-enlist28[i])/(enlist28[i+1]-enlist28[i]);
+                break;
+              }
+            }
+            for(Int_t i=0;i<100;i++){
+              if(enb>=enlist30[i]){
+                thetahigh=anglist30[i]+(anglist30[i+1]-anglist30[i])*(enb-enlist30[i])/(enlist30[i+1]-enlist30[i]);
+                break;
+              }
+            }
+            thetacm = thetalow + (thetahigh-thetalow)*(energylab-28.0)/(30.0-28.0);
+          }
+          else if(energylab>=25.0&&energylab<28.0){
+            for(Int_t i=0;i<100;i++){
+              if(enb>=enlist25[i]){
+                thetalow=anglist25[i]+(anglist25[i+1]-anglist25[i])*(enb-enlist25[i])/(enlist25[i+1]-enlist25[i]);
+                break;
+              }
+            }
+            for(Int_t i=0;i<100;i++){
+              if(enb>=enlist28[i]){
+                thetahigh=anglist28[i]+(anglist28[i+1]-anglist28[i])*(enb-enlist28[i])/(enlist28[i+1]-enlist28[i]);
+                break;
+              }
+            }
+            thetacm = thetalow + (thetahigh-thetalow)*(energylab-25.0)/(28.0-25.0);
+          }
+          else if(energylab>=23.0&&energylab<25.0){
+            for(Int_t i=0;i<100;i++){
+              if(enb>=enlist23[i]){
+                thetalow=anglist23[i]+(anglist23[i+1]-anglist23[i])*(enb-enlist23[i])/(enlist23[i+1]-enlist23[i]);
+                break;
+              }
+            }
+            for(Int_t i=0;i<100;i++){
+              if(enb>=enlist25[i]){
+                thetahigh=anglist25[i]+(anglist25[i+1]-anglist25[i])*(enb-enlist25[i])/(enlist25[i+1]-enlist25[i]);
+                break;
+              }
+            }
+            thetacm = thetalow + (thetahigh-thetalow)*(energylab-23.0)/(25.0-23.0);
+          }
+          else if(energylab>=20.0&&energylab<23.0){
+            for(Int_t i=0;i<100;i++){
+              if(enb>=enlist20[i]){
+                thetalow=anglist20[i]+(anglist20[i+1]-anglist20[i])*(enb-enlist20[i])/(enlist20[i+1]-enlist20[i]);
+                break;
+              }
+            }
+            for(Int_t i=0;i<100;i++){
+              if(enb>=enlist23[i]){
+                thetahigh=anglist23[i]+(anglist23[i+1]-anglist23[i])*(enb-enlist23[i])/(enlist23[i+1]-enlist23[i]);
+                break;
+              }
+            }
+            thetacm = thetalow + (thetahigh-thetalow)*(energylab-20.0)/(23.0-20.0);
+          }
+          else if(energylab>=18.0&&energylab<20.0){
+            for(Int_t i=0;i<100;i++){
+              if(enb>=enlist18[i]){
+                thetalow=anglist18[i]+(anglist18[i+1]-anglist18[i])*(enb-enlist18[i])/(enlist18[i+1]-enlist18[i]);
+                break;
+              }
+            }
+            for(Int_t i=0;i<100;i++){
+              if(enb>=enlist20[i]){
+                thetahigh=anglist20[i]+(anglist20[i+1]-anglist20[i])*(enb-enlist20[i])/(enlist20[i+1]-enlist20[i]);
+                break;
+              }
+            }
+            thetacm = thetalow + (thetahigh-thetalow)*(energylab-18.0)/(20.0-18.0);
+          }
+          else if(energylab>=15.0&&energylab<18.0){
+            for(Int_t i=0;i<100;i++){
+              if(enb>=enlist15[i]){
+                thetalow=anglist15[i]+(anglist15[i+1]-anglist15[i])*(enb-enlist15[i])/(enlist15[i+1]-enlist15[i]);
+                break;
+              }
+            }
+            for(Int_t i=0;i<100;i++){
+              if(enb>=enlist18[i]){
+                thetahigh=anglist18[i]+(anglist18[i+1]-anglist18[i])*(enb-enlist18[i])/(enlist18[i+1]-enlist18[i]);
+                break;
+              }
+            }
+            thetacm = thetalow + (thetahigh-thetalow)*(energylab-15.0)/(18.0-15.0);
+          }
+          else if(energylab>=0.0&&energylab<15.0){
+            for(Int_t i=0;i<100;i++){
+              if(enb>=enlist15[i]){
+                thetahigh=anglist15[i]+(anglist15[i+1]-anglist15[i])*(enb-enlist15[i])/(enlist15[i+1]-enlist15[i]);
+                break;
+              }
+            }
+            thetacm = thetalow + (thetahigh-thetalow)*(energylab-0.0)/(15.0-0.0);
+          }
+          thetacm=180-thetacm;
+          if(thetacm>0.0){
+            //Excitation_EL->Fill(energycm, 2.0/7.0*(ena+enb));
+            Excitation_IN->Fill(thetacm,energycm);
+            Q13_Kine->Fill(anglea,thetacm);
+          }
+        }
+        }
     }
-
-
-
-
-
-    numgood.clear();
-    numspark.clear();
-    if(evnt%10000==0)std::cout<<" Event : "<<evnt<<std::endl;
-    evnt++;
   }
-  file->Close();
+  if(trackVector.size()>2&&!is2B){
+    if(trackquads.at(0)!=trackquads.at(1)&&trackquads.at(1)!=trackquads.at(2)&&trackquads.at(2)!=trackquads.at(0)&&TMath::Abs(avg(Phi0Array)-avg(Phi2Array))>5.0){
+      Double_t range0 = (maxradvec[0]-trackVector.at(0).GetTrackVertex()).Mag();
+      Double_t range1 = (maxradvec[1]-trackVector.at(1).GetTrackVertex()).Mag();
+      Double_t range2 = (maxradvec[2]-trackVector.at(2).GetTrackVertex()).Mag();
+      Double_t sumrange= range0+range1+range2;
+    //  dalitz->Fill(range0/sumrange,range1/sumrange,range2/sumrange);
+      dalitz->Fill(trackVector.at(0).GetAngleZAxis()*TMath::RadToDeg(),trackVector.at(1).GetAngleZAxis()*TMath::RadToDeg(),trackVector.at(2).GetAngleZAxis()*TMath::RadToDeg());
+    }
+  }
+
 }
 
-//filing in theoretical kinematic lines...
-Double_t *ThetaCMS = new Double_t[20000];
-Double_t *ThetaLabRec = new Double_t[20000];
-Double_t *EnerLabRec = new Double_t[20000];
-Double_t *ThetaLabSca = new Double_t[20000];
-Double_t *EnerLabSca = new Double_t[20000];
-Double_t *ThetaCMSIn = new Double_t[20000];
-Double_t *ThetaLabRecIn = new Double_t[20000];
-Double_t *EnerLabRecIn = new Double_t[20000];
-Double_t *ThetaLabScaIn = new Double_t[20000];
-Double_t *EnerLabScaIn = new Double_t[20000];
-Double_t *ThetaCMS2 = new Double_t[20000];
-Double_t *ThetaLabRec2 = new Double_t[20000];
-Double_t *EnerLabRec2 = new Double_t[20000];
-Double_t *ThetaLabSca2 = new Double_t[20000];
-Double_t *EnerLabSca2 = new Double_t[20000];
 
 
-std::ifstream *kineStr = new std::ifstream(fileKine.Data());
-Int_t numKin=0;
-
-if(!kineStr->fail()){
-  while(!kineStr->eof()){
-    *kineStr>>ThetaCMS[numKin]>>ThetaLabRec[numKin]>>EnerLabRec[numKin]>>ThetaLabSca[numKin]>>EnerLabSca[numKin];
-    numKin++;
-  }
-}else if(kineStr->fail()) std::cout<<" Warning : No Kinematics file found for this reaction! Please run the macro on $SIMPATH/macro/Kinematics/Decay_kinematics/Mainrel.cxx"<<std::endl;
-TGraph *Kine_AngRec_AngSca = new TGraph(numKin,ThetaLabRec,ThetaLabSca);
-TGraph *Kine_AngRec_AngSca_vert = new TGraph(numKin,ThetaLabSca,ThetaLabRec);
 
 
-TString kinfileIn = "KineInEl.txt";
-std::ifstream *kineStrIn = new std::ifstream(kinfileIn.Data());
-numKin=0;
+numgood.clear();
+numspark.clear();
+if(evnt%10000==0)std::cout<<" Event : "<<evnt<<std::endl;
+evnt++;
+}
+file->Close();
+}
 
-if(!kineStrIn->fail()){
-  while(!kineStrIn->eof()){
-    *kineStrIn>>ThetaCMSIn[numKin]>>ThetaLabRecIn[numKin]>>EnerLabRecIn[numKin]>>ThetaLabScaIn[numKin]>>EnerLabScaIn[numKin];
-    numKin++;
-  }
-}else if(kineStrIn->fail()) std::cout<<" Warning : No Kinematics file found for this reaction! Please run the macro on $SIMPATH/macro/Kinematics/Decay_kinematics/Mainrel.cxx"<<std::endl;
-TGraph *Kine_AngRec_AngSca_In = new TGraph(numKin,ThetaLabRecIn,ThetaLabScaIn);
-TGraph *Kine_AngRec_AngSca_In_vert = new TGraph(numKin,ThetaLabScaIn,ThetaLabRecIn);
 
 c2->cd(1);
-gPad->SetLogz();
-PID->Draw("colz");
-pidcut->Draw("same");
-//Vertex->Draw();
+//gPad->SetLogz();
+//PID->Draw("colz");
+//pidcut->Draw("same");
+Vertex->Draw();
 c2->cd(2);
-Vertex_vs_Angle->Draw("colz");
+//Vertex_vs_Angle->Draw("colz");
+Vertex1->Draw();
 
+leg = new TLegend(0.1,0.1,0.2,0.2);
+leg->AddEntry(Kine_AngRec_AngSca, "elastic","l");
+leg->AddEntry(Kine_AngRec_AngSca_In, "inelastic","l");
 c3->cd(1);
 gPad->SetLogz();
 Q02_Kine->Draw("colz");
@@ -691,29 +1061,32 @@ Kine_AngRec_AngSca->Draw("C");
 Kine_AngRec_AngSca_vert->Draw("C");
 Kine_AngRec_AngSca_In->Draw("C");
 Kine_AngRec_AngSca_In_vert->Draw("C");
-wideElasticup->Draw("same");
+//wideElasticup->Draw("same");
+//inelasticcut->Draw("same");
+leg->Draw();
 c3->cd(2);
 gPad->SetLogz();
 Q13_Kine->Draw("colz");
 
 
 c4->cd();
-// dalitz->Draw("same");
+//dalitz->Draw("same");
 trackpic->Draw();
 for(Int_t i =0;i<tracksGraph.size();i++){
   tracksGraph.at(i)->Draw("same");
 }
 
 c5->cd(1);
-PhiCompare->Draw("*");
+//PhiCompare->Draw("*");
 c5->cd(2);
-PhiCompare1->Draw();
+//PhiCompare1->Draw();
 
 c6->cd(1);
 gPad->SetLogz();
 Excitation_EL->Draw("colz");
-cut1->Draw("same");
-cut2->Draw("same");
+//corr->Draw("C");
+//cut1->Draw("same");
+//cut2->Draw("same");
 c6->cd(2);
 gPad->SetLogz();
 Excitation_IN->Draw("colz");

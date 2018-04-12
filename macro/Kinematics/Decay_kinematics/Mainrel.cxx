@@ -63,7 +63,7 @@ int Mainrel(){
 		//cout<<El4<<endl;
 
 		int AD1=10;//mass0 of the daughter 1
-		int ZD1=2;//charge of the daugther 2
+		int ZD1=4;//charge of the daugther 2
 		char *ElD1=new char[2];
 
 		int AD2=4;//mass0 of the daughter 1
@@ -74,10 +74,10 @@ int Mainrel(){
 
 		double ex1=0.0; //excitation energy of the incident particle
 		double ex2=0.0; //excitation energy of the target
-		double ex3=3.36803; //excitation energy of the scattered particle
+		double ex3=0.0;//3.36803; //excitation energy of the scattered particle
 		double ex4=0.0; //excitation energy of the recoil
 
-		double tbt=3.0; // incident energy (total Lab energy in MeV)
+		double tbt=4.3; // incident energy (total Lab energy in MeV)
 
 		double Energyrdec,Anglerdec;
 

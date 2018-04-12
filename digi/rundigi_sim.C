@@ -19,7 +19,7 @@ void rundigi_sim()
   // __ Run ____________________________________________
   FairRunAna* fRun = new FairRunAna();
               fRun -> SetInputFile(mcFile);
-              fRun -> SetOutputFile("~/fair_install/ATTPCROOTv2/macro/10Be/output.root");
+              fRun -> SetOutputFile("~/fair_install/ATTPCROOTv2/digi/output_sim.root");
 
 
   FairRuntimeDb* rtdb = fRun->GetRuntimeDb();

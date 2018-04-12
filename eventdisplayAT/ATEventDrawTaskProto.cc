@@ -637,7 +637,7 @@ ATEventDrawTaskProto::DrawPadAll()
         if (i>=0&&i<64) fPadAll[i]->SetLineColor(kRed);                         // Q1, red
         else if(i>=64 && i<127) fPadAll[i]->SetLineColor(kGreen);           // Q2, green
         else if(i>=127 && i<190) fPadAll[i]->SetLineColor(kBlue);           // Q3, blue
-        else if(i>=190 && i<253) fPadAll[i]->SetLineColor(kYellow);   // Q4, yellow
+        else if(i>=190 && i<253) fPadAll[i]->SetLineColor(kBlack);   // Q4, yellow
         else fPadAll[i]->SetLineColor(0);                              //white for non physical pads
         fPadAll[i] -> Draw("SAME");
 

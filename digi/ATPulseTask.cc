@@ -68,7 +68,7 @@ fDriftedElectronArray = (TClonesArray *) ioman -> GetObject("ATSimulatedPoint");
   ioman -> Register("ATRawEvent", "cbmsim", fRawEventArray, fIsPersistent);
 
   fGain = fPar->GetGain();
-  std::cout<<"Gain: "<<fGain<<std::endl;
+  //std::cout<<"Gain: "<<fGain<<std::endl;
 
   // ***************Create ATTPC Pad Plane***************************
   // TString scriptfile = "LookupProto10Be.xml";
@@ -100,7 +100,7 @@ void
 ATPulseTask::Exec(Option_t* option)
 {
   fLogger->Debug(MESSAGE_ORIGIN,"Exec of ATPulseTask");
-
+  gRandom->SetSeed(1.0);
 
   Int_t nMCPoints = fDriftedElectronArray->GetEntries();
   std::cout<<" ATPulseTask: Number of Points "<<nMCPoints<<std::endl;
@@ -133,7 +133,7 @@ ATPulseTask::Exec(Option_t* option)
    TVector3 coord;
    ATSimulatedPoint* dElectron;
    std::vector<Float_t> PadCenterCoord;
-   TF1 *gain                        =  new TF1("gain", "4*(x/[0])*pow(2.718, -2*(x/[0]))", 80, 120);//Polya distribution of gain
+   TF1 *gain                        =  new TF1("gain", "4*(x/[0])*exp(-2*(x/[0]))", 0.1, 5000);//Polya distribution of gain
    gain->SetParameter(0, fGain);
 
 
@@ -173,7 +173,7 @@ ATPulseTask::Exec(Option_t* option)
 
          // *********Pulse Generation for each electron************
          for(Double_t j = eTime; j<eTime+10; j+=samplingrate/5.0){
-           output                = pow(2.718,-3*((j-eTime)/tau))*sin((j-eTime)/tau)*pow((j-eTime)/tau,3);
+           output                = exp(-3*((j-eTime)/tau))*sin((j-eTime)/tau)*pow((j-eTime)/tau,3);
            pointmem[counter][0]  = j;
            pointmem[counter][1]  = output;
            counter++;

@@ -7,7 +7,7 @@
 #include <fstream>
 
 
-void run_sim_ana_v2(Int_t num_ev=10000)
+void run_sim_ana_v2(Int_t num_ev=16000)
 {
 
     TH2D *Eloss_vs_Range_Sca = new TH2D("Eloss_vs_Range_Sca","ELoss_vs_Range_Sca",100,0,1000,300,0,300);
@@ -20,7 +20,7 @@ void run_sim_ana_v2(Int_t num_ev=10000)
     Eloss_vs_Range_Rec->SetMarkerColor(2);
 
     TH2D *tracks = new TH2D("tracks","tracks",1000,-100,1000,1000,-300,300);
-
+    TH2D* Q02_Kine = new TH2D("Q02_Kine","Q02_Kine",180,0,180,180,0,180);
 
     TH1D *ELossRatio = new TH1D("ElossRatio","ELossRatio",1000,0,1000);
 
@@ -98,6 +98,7 @@ void run_sim_ana_v2(Int_t num_ev=10000)
         Double_t BeamEnergyLoss_IC=0.0;
         Double_t EnergyRecoil = 0.0;
         Double_t AngleRecoil = 0.0;
+        Double_t AngleScatter = 0.0;
 	Double_t zpos = 0.0;
 	Double_t xpos = 0.0;
         Double_t radius=0.0;
@@ -212,6 +213,7 @@ void run_sim_ana_v2(Int_t num_ev=10000)
             if(trackID==1 && VolName=="drift_volume"){ //SCATTER
                 range_sca = point -> GetLength()*10; //mm
                 energyLoss_sca+=( point -> GetEnergyLoss() )*1000;//MeV
+                AngleScatter= point->GetAIni();
                 // std::cout<<" Track ID : "<<trackID<<std::endl;
                 // std::cout<<" Range_sca : "<<range_sca<<std::endl;
                 // std::cout<<" energyLoss_sca : "<<energyLoss_sca<<std::endl;
@@ -243,6 +245,13 @@ void run_sim_ana_v2(Int_t num_ev=10000)
             ELossRatio->Fill(energyLoss_sca/energyLoss_rec);
 
             HKineRecoil->Fill(AngleRecoil,EnergyRecoil);
+
+            if(range_rec>=range_sca){
+              Q02_Kine->Fill(AngleRecoil,AngleScatter);
+            }
+            else{
+              Q02_Kine->Fill(AngleScatter,AngleRecoil);
+            }
 
 
 
@@ -290,8 +299,8 @@ void run_sim_ana_v2(Int_t num_ev=10000)
 	}
 
       c5->cd(1);
-      rad->Draw();
-
+      //rad->Draw();
+Q02_Kine->Draw("colz");
 
 
 
