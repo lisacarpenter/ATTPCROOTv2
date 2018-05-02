@@ -83,6 +83,7 @@ void AtTpc::Initialize()
   FairRuntimeDb* rtdb= FairRun::Instance()->GetRuntimeDb();
   AtTpcGeoPar* par=(AtTpcGeoPar*)(rtdb->getContainer("AtTpcGeoPar"));
 
+
 }
 
 Bool_t  AtTpc::ProcessHits(FairVolume* vol)
@@ -213,6 +214,9 @@ Bool_t  AtTpc::ProcessHits(FairVolume* vol)
     fELossAcc+= fELoss;
     fTime = gMC->TrackTime() * 1.0e09;
     fLength = gMC->TrackLength();
+    //gMC->SetMaxStep(0.015);
+    //gMC->SetMaxNStep(10000);
+    //std::cout<<"Number of track steps: "<<(gMC->TrackLength())/(gMC->TrackStep())<<std::endl;
     gMC->TrackPosition(fPosIn);
     gMC->TrackMomentum(fMomIn);
     fTrackID  = gMC->GetStack()->GetCurrentTrackNumber();

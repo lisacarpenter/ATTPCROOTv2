@@ -58,7 +58,7 @@ ATClusterizeTask::Init()
   ioman -> Register("ATSimulatedPoint", "cbmsim",fElectronNumberArray, fIsPersistent);
 
 
-  fEIonize  = fPar->GetEIonize()/1000; // [MeV]
+  fEIonize  = fPar->GetEIonize()/1000000.0; // [MeV]
   fVelDrift = fPar->GetDriftVelocity(); // [cm/us]
   fCoefT    = fPar->GetCoefDiffusionTrans()*sqrt(10.); // [cm^(-1/2)] to [mm^(-1/2)]
   fCoefL    = fPar->GetCoefDiffusionLong()*sqrt(10.);  // [cm^(-1/2)] to [mm^(-1/2)]
@@ -87,9 +87,9 @@ ATClusterizeTask::Exec(Option_t* option)
    Double_t  x = 0;
    Double_t  y = 0;
    Double_t  z = 0;
-   Double_t  fano = 2;
+   Double_t  fano = 0.17;
    Int_t     nElectrons   = 0;
-   Int_t     eFlux        = 0;
+   Double_t     eFlux        = 0;
    Int_t     genElectrons = 0;
    //Double_t  eIonize      = 15.603/1000; //Ionization energy (MeV)
    TString   VolName;
@@ -120,15 +120,20 @@ ATClusterizeTask::Exec(Option_t* option)
            z                 = 0.0-(fMCPoint->GetZIn()*10); //mm
            energyLoss_rec    =(fMCPoint -> GetEnergyLoss() )*1000;//MeV
            nElectrons        = int(floor(energyLoss_rec/fEIonize)); //mean electrons generated
-           eFlux             = pow(fano*nElectrons, 0.5);//fluctuation of generated electrons
-           genElectrons      = gRandom->Gaus(nElectrons, eFlux);//generated electrons
+           eFlux             = TMath::Sqrt(fano*nElectrons);//fluctuation of generated electrons
+           if(nElectrons>10){
+             genElectrons      = (int)(gRandom->Gaus(nElectrons, eFlux));//generated electrons
+           }
+           else{
+             genElectrons      = (int)(gRandom->Poisson(nElectrons));//generated electrons
+           }
 
+           //std::cout<<"gen electrons \t"<<genElectrons<<std::endl;
            driftLength       = abs(z-zMesh); //mm
            sigstrtrans       = fCoefT* sqrt(driftLength);//transverse diffusion coefficient
            sigstrlong        = fCoefL* sqrt(driftLength);//longitudal diffusion coefficient
            //trans->SetParameter(0, sigstrtrans);
 
-           for(Int_t charge = 0; charge<genElectrons; charge++){   //for every electron in the cluster
                //r               = trans->GetRandom(); //non-Gaussian cloud
 		           r               = gRandom -> Gaus(0,sigstrtrans); //Gaussian cloud
                phi             = gRandom->Uniform(0, TMath::TwoPi());
@@ -142,10 +147,11 @@ ATClusterizeTask::Exec(Option_t* option)
                Int_t size = fElectronNumberArray -> GetEntriesFast();
                ATSimulatedPoint* simpoint
                  = new((*fElectronNumberArray)[size]) ATSimulatedPoint(electronNumber,  //electron #
+                                                                      genElectrons,
                                                                       propX,  //X
                                                                       propY,  //Y
                                                                       driftTime);  //Z
-          }//end producing e- and filling ATSimpoint
+
      }//end if drift volume
  }//end through all interaction points
 

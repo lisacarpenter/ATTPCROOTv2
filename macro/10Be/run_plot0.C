@@ -93,7 +93,7 @@ TGraph2D *line3d(std::vector<Double_t> parFit ){
   return graph;
 }
 
-void run_plot0(Int_t runnum=21,Int_t viewEvent = 75)
+void run_plot0(Int_t runnum=21,Int_t viewEvent = 1975)
 {
 
   //filing in theoretical kinematic lines...
@@ -492,7 +492,7 @@ void run_plot0(Int_t runnum=21,Int_t viewEvent = 75)
       }
 
 
-      //if(evnt==viewEvent)cout<<trackVector.size()<<endl;
+      if(evnt==viewEvent)cout<<trackVector.size()<<endl;
       RedChi2.clear();
       trackquads.clear();
       maxrad.clear();
@@ -797,7 +797,7 @@ void run_plot0(Int_t runnum=21,Int_t viewEvent = 75)
               thetacm=180-(2*anglea);
               if (thetacm<0) thetacm= thetacm+180.0;
               //calculating the energy from the center of mass position
-
+              cout<<evnt<<"\t"<<thetacm<<"\t"<<energycm<<endl;
               if(1==1){//TMath::Abs(avg(Phi0Array)-avg(Phi2Array))<15.0){ //not currently cutting on phi, resolution not good enough
                 //Excitation_EL->Fill(energycm, 2.0/7.0*(ena+enb)); //resolution plot
                 Excitation_EL->Fill(thetacm,energycm); //excitation function, elastic

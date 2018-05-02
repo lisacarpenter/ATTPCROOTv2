@@ -1,4 +1,4 @@
-void run_sim_2B(Int_t nEvents = 1, TString mcEngine = "TGeant4")
+void run_sim_2B(Int_t nEvents = 10000, TString mcEngine = "TGeant4")
 {
 
   TString dir = getenv("VMCWORKDIR");
@@ -77,9 +77,9 @@ void run_sim_2B(Int_t nEvents = 1, TString mcEngine = "TGeant4")
 	        Double_t py = 0.000/a;  // Y-Momentum / per nucleon!!!!!!
 	        Double_t pz = 0.895/a;  // Z-Momentum / per nucleon!!!!!!
   	        Double_t BExcEner = 0.0;
-                Double_t Bmass = 9.3; //Mass in GeV
-                Double_t NomEnergy = 45.0; //Nominal Energy of the beam: Only used for cross section calculation (Tracking energy is determined with momentum). TODO: Change this to the energy after the IC
-                Double_t TargetMass = 3.72;//Mass in GeV
+                Double_t Bmass = 9.3255; //Mass in GeV
+                Double_t NomEnergy = 43.0; //Nominal Energy of the beam: Only used for cross section calculation (Tracking energy is determined with momentum). TODO: Change this to the energy after the IC
+                Double_t TargetMass = 3.7284;//Mass in GeV
 
 
 	          ATTPCIonGenerator* ionGen = new ATTPCIonGenerator("Ion",z,a,q,m,px,py,pz,BExcEner,Bmass,NomEnergy);
@@ -130,7 +130,7 @@ void run_sim_2B(Int_t nEvents = 1, TString mcEngine = "TGeant4")
             		  Pxp.push_back(0.0);
                   Pyp.push_back(0.0);
             		  Pzp.push_back(0.0);
-                  Mass.push_back(3.72);
+                  Mass.push_back(3.7284);
             		  ExE.push_back(0.0);//In MeV
 
                   //--- Scattered -----
@@ -140,7 +140,7 @@ void run_sim_2B(Int_t nEvents = 1, TString mcEngine = "TGeant4")
 		  Pxp.push_back(0.0);
 		  Pyp.push_back(0.0);
 		  Pzp.push_back(0.0);
-		  Mass.push_back(9.3);
+		  Mass.push_back(9.3255);
 		  ExE.push_back(0.0);
 
 
@@ -151,7 +151,7 @@ void run_sim_2B(Int_t nEvents = 1, TString mcEngine = "TGeant4")
 		  Pxp.push_back(0.0);
                   Pyp.push_back(0.0);
 		  Pzp.push_back(0.0);
-                  Mass.push_back(3.72);
+                  Mass.push_back(3.7284);
 		  ExE.push_back(0.0);//In MeV
 
 

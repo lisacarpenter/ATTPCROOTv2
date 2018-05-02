@@ -60,12 +60,12 @@ void plotpads()
     for(Int_t i=0;i<meshSignal->GetSize();i++){
       //meshSignal->SetBinContent(i,0.0);
     }
-    if(nEve==1975){
+    if(nEve==189){
       std::vector<ATPad> *padVec=rawEvent->GetPads();
       cout<<padVec->size()<<endl;
       for(Int_t j=0;j<padVec->size();j++){
         for(Int_t k=0;k<512;k++){
-          if(padVec->at(j).GetADC(k)>10)meshSignal->AddBinContent(meshSignal->FindBin(k),padVec->at(j).GetADC(k));
+          if(padVec->at(j).GetADC(k)>threshold)meshSignal->AddBinContent(meshSignal->FindBin(k),padVec->at(j).GetADC(k));
           //if(padVec->at(j).GetADC(k)>10)cout<<padVec->at(j).GetPadNum()<<"\t"<<k<<"\t"<<padVec->at(j).GetADC(k)<<endl;
           //cout<<meshSignal->GetBinContent(k)<<endl;
           if(padVec->at(j).GetADC(k)>threshold){

@@ -19,7 +19,7 @@ void rundigi_sim()
   // __ Run ____________________________________________
   FairRunAna* fRun = new FairRunAna();
               fRun -> SetInputFile(mcFile);
-              fRun -> SetOutputFile("~/fair_install/ATTPCROOTv2/digi/output_sim.root");
+              fRun -> SetOutputFile("~/fair_install/ATTPCROOTv2/macro/10Be/output_sim.root");
 
 
   FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
@@ -62,7 +62,7 @@ void rundigi_sim()
 
   // __ Init and run ___________________________________
   fRun -> Init();
-  fRun -> Run(1,20000);
+  fRun -> Run(0,10000);
   //fRun -> RunOnTBData();
 
   std::cout << std::endl << std::endl;

@@ -9,7 +9,7 @@
 class ATSimulatedPoint : public TObject {
   public:
     ATSimulatedPoint();
-    ATSimulatedPoint(Int_t electronNumber, Double_t x, Double_t y, Double_t atime);
+    ATSimulatedPoint(Int_t electronNumber, Int_t amplitude, Double_t x, Double_t y, Double_t atime);
     ~ATSimulatedPoint();
 
     //!< Track ID setter
@@ -22,12 +22,14 @@ class ATSimulatedPoint : public TObject {
 
     //!< Track ID getter
     Int_t GetElectronNumber();
+    Int_t GetAmplitude();
     //!< Position getter
     TVector3 GetPosition();
 
   private:
     //!< Track ID having this hit
     Int_t fElectronNumber;
+    Int_t fAmplitude;
     //!< Position
     TVector3 fPosition;
 

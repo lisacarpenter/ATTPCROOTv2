@@ -128,6 +128,7 @@ ATPulseTask::Exec(Option_t* option)
    Double_t c                       = 10;
    Int_t  vsize;
    Int_t cc                         = 0;
+   Int_t amplitude;
    Double_t pBin, g, xElectron, yElectron, eTime, clusterNum, eventID;
    Int_t padNumber;
    TVector3 coord;
@@ -147,6 +148,7 @@ ATPulseTask::Exec(Option_t* option)
        for(Int_t iEvents = 1; iEvents<nMCPoints; iEvents++){//for every electron
          dElectron                     = (ATSimulatedPoint*) fDriftedElectronArray -> At(iEvents);
          coord                         = dElectron->GetPosition();
+         amplitude                     = dElectron->GetAmplitude();
          xElectron                     = coord (0); //mm
          yElectron                     = coord (1); //mm
          eTime                         = coord (2); //us
@@ -173,7 +175,7 @@ ATPulseTask::Exec(Option_t* option)
 
          // *********Pulse Generation for each electron************
          for(Double_t j = eTime; j<eTime+10; j+=samplingrate/5.0){
-           output                = exp(-3*((j-eTime)/tau))*sin((j-eTime)/tau)*pow((j-eTime)/tau,3);
+           output                = exp(-3*((j-eTime)/tau))*sin((j-eTime)/tau)*pow((j-eTime)/tau,3)*amplitude;
            pointmem[counter][0]  = j;
            pointmem[counter][1]  = output;
            counter++;
