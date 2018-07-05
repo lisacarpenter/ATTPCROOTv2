@@ -80,6 +80,10 @@ double avg(std::vector<Double_t> *v) {
 TGraph2D *line3d(std::vector<Double_t> parFit ){
   //input the paramenters of the fit, returns the TGraph of the fit line
   TGraph2D *graph = new TGraph2D(1000);
+  stringstream convert;
+  convert<<parFit[0]<<parFit[1]<<parFit[2]<<parFit[3];
+  TString name = convert.str();
+  graph->SetName(name);
   for (int j = 0; j<1000;++j){
     double t = j;
     double x,y,z,r;
@@ -132,6 +136,25 @@ void acceptance_2013(){
     numLen++;
   }
 
+  Double_t *ThetaCMS = new Double_t[1800];
+  Double_t *ThetaLabRec = new Double_t[1800];
+  Double_t *EnerLabRec = new Double_t[1800];
+  Double_t *ThetaLabSca = new Double_t[1800];
+  Double_t *EnerLabSca = new Double_t[1800];
+  TString fileKine="../Kinematics/Decay_kinematics/10Be_4He_19MeV.txt";
+  std::ifstream *kineStr = new std::ifstream(fileKine.Data());
+  Int_t numKin=0;
+
+  if(!kineStr->fail()){
+    while(!kineStr->eof()){
+      *kineStr>>ThetaCMS[numKin]>>ThetaLabRec[numKin]>>EnerLabRec[numKin]>>ThetaLabSca[numKin]>>EnerLabSca[numKin];
+      numKin++;
+    }
+  }else if(kineStr->fail()) std::cout<<" Warning : No Kinematics file found for this reaction! Please run the macro on $SIMPATH/macro/Kinematics/Decay_kinematics/Mainrel.cxx"<<std::endl;
+  TGraph *Kine_AngRec_AngSca = new TGraph(numKin,ThetaLabRec,ThetaLabSca);
+  TGraph *Kine_AngRec_AngSca_vert = new TGraph(numKin,ThetaLabSca,ThetaLabRec);
+
+
   TCanvas *c2 = new TCanvas("c2","c2",200,10,700,700);
   c2->Divide(3,1);
   TCanvas *c3 = new TCanvas("c3","c3",200,10,700,700);
@@ -142,7 +165,7 @@ void acceptance_2013(){
   TH2D* Reconstructed = new TH2D("Reconstructed", "Reconstructed",60,0,180,75,0,15);
   TH2D* Accepted = new TH2D("Accepted", "Accepted",60,0,180,75,0,15);
   TH1D* size = new TH1D("size", "size", 1000,0,1000);
-  TH2D* Q02_Kine = new TH2D("Q02_Kine","Q02_Kine",75,0,15,75,0,15);
+  TH2D* Q02_Kine = new TH2D("Q02_Kine","Q02_Kine",180,0,180,180,0,180);
   TH2D* AllPoints0 = new TH2D("AllPoints0", "AllPoints0", 2600,-130,130,2600,-130,130);
   TH2D* AllPoints1 = new TH2D("AllPoints1", "AllPoints1", 2600,-130,130,2600,-130,130);
   TH2D* AllPoints2 = new TH2D("AllPoints2", "AllPoints2", 2600,-130,130,2600,-130,130);
@@ -214,11 +237,11 @@ void acceptance_2013(){
         if(iEvent==193)AllPoints3->SetBinContent(AllPoints3->FindBin(point->GetXIn(),point->GetYIn()),point->GetEnergyLoss());
         if(point->GetYIn()>=0){
           if(point->GetXIn()>=0){
-              //if(iEvent==189)AllPoints0->SetBinContent(AllPoints0->FindBin(point->GetXIn(),point->GetYIn()),point->GetEnergyLoss());
+            //if(iEvent==189)AllPoints0->SetBinContent(AllPoints0->FindBin(point->GetXIn(),point->GetYIn()),point->GetEnergyLoss());
             quada=0;
           }
           else{
-              //if(iEvent==189)AllPoints1->SetBinContent(AllPoints1->FindBin(point->GetXIn(),point->GetYIn()),point->GetEnergyLoss());
+            //if(iEvent==189)AllPoints1->SetBinContent(AllPoints1->FindBin(point->GetXIn(),point->GetYIn()),point->GetEnergyLoss());
 
             quada=1;
           }
@@ -239,7 +262,7 @@ void acceptance_2013(){
         EnergyScatter= point->GetEIni();
         AngleScatter= point->GetAIni();
         //cout<<EnergyScatter<<"\t"<<AngleScatter<<"sca"<<endl;
-if(iEvent==193)AllPoints1->SetBinContent(AllPoints1->FindBin(point->GetXIn(),point->GetYIn()),point->GetEnergyLoss());
+        if(iEvent==193)AllPoints1->SetBinContent(AllPoints1->FindBin(point->GetXIn(),point->GetYIn()),point->GetEnergyLoss());
         if(point->GetYIn()>=0){
           if(point->GetXIn()>=0){
             //  if(iEvent==189)AllPoints0->SetBinContent(AllPoints0->FindBin(point->GetXIn(),point->GetYIn()),point->GetEnergyLoss());
@@ -252,7 +275,7 @@ if(iEvent==193)AllPoints1->SetBinContent(AllPoints1->FindBin(point->GetXIn(),poi
         }
         else{
           if(point->GetXIn()<=0){
-          //    if(iEvent==189)AllPoints2->SetBinContent(AllPoints2->FindBin(point->GetXIn(),point->GetYIn()),point->GetEnergyLoss());
+            //    if(iEvent==189)AllPoints2->SetBinContent(AllPoints2->FindBin(point->GetXIn(),point->GetYIn()),point->GetEnergyLoss());
             quadb=2;
           }
           else{
@@ -407,7 +430,7 @@ if(iEvent==193)AllPoints1->SetBinContent(AllPoints1->FindBin(point->GetXIn(),poi
         //angleb = goodang*TMath::RadToDeg();
       }
 
-      //Q02_Kine->Fill(anglea,angleb);
+      Q02_Kine->Fill(trackVector.at(0).GetAngleZAxis()*TMath::RadToDeg(),trackVector.at(1).GetAngleZAxis()*TMath::RadToDeg());
       if(anglea>5.0&&anglea<20.0&&AngleRecoil>60.0&&trackVector.at(0).GetAngleZAxis()>trackVector.at(1).GetAngleZAxis()){
         //cout<<iEvent<<"\t"<<trackVector.size()<<endl;
       }
@@ -418,40 +441,59 @@ if(iEvent==193)AllPoints1->SetBinContent(AllPoints1->FindBin(point->GetXIn(),poi
       if(index<=500&&index>0){
         energycm=2.0/7.0*(EnergyMM[index]+(EnergyMM[index]-EnergyMM[index+1])*over);
       }
-      Q02_Kine->Fill(2.0/7.0*(EnergyScatter+EnergyRecoil),energycm);
+      //Q02_Kine->Fill(2.0/7.0*(EnergyScatter+EnergyRecoil),energycm);
       thetacm=180.0-(2.0*anglea);
       if (thetacm<0) thetacm= thetacm+180.0;
-      Reconstructed->Fill(thetacm,energycm);
       reco = kTRUE;
-      entrancetb = 600;
-      for(Int_t tb = 512;tb>0;tb--){
-        if(MeshArray[tb]>threshold){
-          entrancetb = tb;
-          if(entrancetb>mcp&&entrancetb-width<mcp){
-            accept=kTRUE;
-            Accepted->Fill(thetacm,energycm);
+      if(1==1){//TMath::Abs(AngleRecoil - anglea)<5.0 && TMath::Abs(2.0/7.0*(EnergyScatter+EnergyRecoil) - energycm)<0.4){
+        Reconstructed->Fill(180.0-(2.0*AngleRecoil),2.0/7.0*(EnergyScatter+EnergyRecoil));
+        reco = kTRUE;
+        entrancetb = 600;
+        for(Int_t tb = 512;tb>0;tb--){
+          if(MeshArray[tb]>threshold){
+            entrancetb = tb;
+            if(entrancetb>mcp&&entrancetb-width<mcp){
+              accept=kTRUE;
+              Accepted->Fill(180.0-(2.0*AngleRecoil),2.0/7.0*(EnergyScatter+EnergyRecoil));
+              break;
+            }
           }
-          break;
         }
       }
     }
-  if(reco==kFALSE) {
-    //Q02_Kine->Fill(EnergyRecoil,EnergyScatter);
-    //cout<<EnergyScatter<<"\t"<<EnergyRecoil<<endl;
-    //size->Fill(EnergyRecoil);
-  }
+    if(reco==kFALSE) {
+      //Q02_Kine->Fill(EnergyRecoil,EnergyScatter);
+      //cout<<EnergyScatter<<"\t"<<EnergyRecoil<<endl;
+      //size->Fill(EnergyRecoil);
+    }
   }
   iEvent++;
 }
+
+for(Int_t i = 1; i<=(All->GetNbinsX()+2)*(All->GetNbinsY()+2); i++){
+  All->SetBinError(i,0.0);
+  Reconstructed->SetBinError(i,0.0);
+  Accepted->SetBinError(i,0.0);
+  if(All->GetBinContent(i)<1.0){
+    All->SetBinContent(i,1.0);
+    Reconstructed->SetBinContent(i,1.0);
+    Accepted->SetBinContent(i,1.0);
+  }
+}
+
 c2->cd(1);
 All->Draw("colz");
 c2->cd(2);
 Reconstructed->Draw("colz");
 c2->cd(3);
+Accepted->Divide(All);
+Accepted->Smooth(5,"k3a");
 Accepted->Draw("colz");
 
 c3->cd();
 Q02_Kine->Draw("colz");
+Kine_AngRec_AngSca->Draw("C");
+Kine_AngRec_AngSca_vert->Draw("C");
 
 c4->cd();
 size->Draw();

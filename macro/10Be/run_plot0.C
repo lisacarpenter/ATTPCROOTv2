@@ -17,6 +17,7 @@
 #include "TFileCollection.h"
 #include "TError.h"
 #include "TMinuit.h"
+#include "TRandom.h"
 
 //#include "../../include/ATEvent.hh"
 //#include "../../include/ATHit.hh"
@@ -142,6 +143,7 @@ void run_plot0(Int_t runnum=21,Int_t viewEvent = 1975)
   TCanvas *c3 = new TCanvas("c3","c3",200,10,700,700);
   c3->Divide(2,1);
   TCanvas *c4 = new TCanvas("c4","c4",200,10,700,700);
+  c4->Divide(2,1);
   TCanvas *c5 = new TCanvas("c5","c5",200,10,700,700);
   c5->Divide(2,1);
   TCanvas *c6 = new TCanvas("c6","c6",1000,500);
@@ -151,13 +153,13 @@ void run_plot0(Int_t runnum=21,Int_t viewEvent = 1975)
   Q02_Kine->SetMarkerColor(2);
   Q02_Kine->SetMarkerStyle(20);
   Q02_Kine->SetMarkerSize(0.7);
-  TH2D* Q13_Kine = new TH2D("Q13_Kine","Q13_Kine",180,0,180,180,0,180);
+  TH2D* Q13_Kine = new TH2D("Q13_Kine","Q13_Kine",75,0,15,75,0,15);
   Q13_Kine->SetMarkerColor(2);
   Q13_Kine->SetMarkerStyle(20);
   Q13_Kine->SetMarkerSize(0.7);
 
-  TH1D* Vertex = new TH1D("Vertex","Vertex",600,0,600);
-  TH1D* Vertex1 = new TH1D("Vertex1","Vertex1",600,0,600);
+  TH1D* Vertex = new TH1D("Vertex","Vertex",80,-5,15);
+  TH1D* Vertex1 = new TH1D("Vertex1","Vertex1",150,0,1500);
   TH2D* Vertex_vs_Angle = new TH2D("Vertex_vs_Angle","Vertex_vs_Angle",2000,-1000,1000,600,0,600);
 
   TH2D* PID = new TH2D("PID","PID",100,0,10000,100,0,500000);
@@ -175,8 +177,16 @@ void run_plot0(Int_t runnum=21,Int_t viewEvent = 1975)
   dalitz->SetMarkerStyle(20);
   dalitz->SetMarkerSize(0.7);
 
-  TH2D* Excitation_EL = new TH2D("Elastic", "Elastic",180,0,180,75,0,15);
-  TH2D* Excitation_IN = new TH2D("Inelastic", "Inelastic",180,0,180,75,0,15);
+  TH2D* dalitz2d = new TH2D("Dalitz2D","Dalitz2D",200,-1,1,200,-1,1);
+
+  Double_t slope = 1.0/TMath::Sqrt(3);
+  TF1 *a = new TF1("a","[0]*x",-1,1);
+  TF1 *b = new TF1("b","[0]*x",-1,1);
+  a->SetParameter(0,slope);
+  b->SetParameter(0,-1*slope);
+
+  TH2D* Excitation_EL = new TH2D("Elastic", "Elastic",60,0,180,75,0,15);
+  TH2D* Excitation_IN = new TH2D("Inelastic", "Inelastic",60,0,180,75,0,15);
 
   TCutG* wideElasticup = new TCutG("wideElasticup",20);
   //elastic cut for "folded" kinematics
@@ -224,11 +234,11 @@ void run_plot0(Int_t runnum=21,Int_t viewEvent = 1975)
   cut1->SetVarX("Evertex");
   cut1->SetVarY("Etracks");
   cut1->SetTitle("small");
-  cut1->SetPoint(0,12.0,12.5);
-  cut1->SetPoint(1,2.4,3.4);
-  cut1->SetPoint(2,2.8,2.9);
-  cut1->SetPoint(3,12.0,11.7);
-  cut1->SetPoint(4,12.0,12.5);
+  cut1->SetPoint(0,11.21,10.1);
+  cut1->SetPoint(1,4.59,4.09);
+  cut1->SetPoint(2,5.0,2.6);
+  cut1->SetPoint(3,11.39,7.73);
+  cut1->SetPoint(4,11.21,10.1);
 
   TCutG* cut2 = new TCutG("cut2",4);
   cut2->SetVarX("Evertex");
@@ -429,6 +439,8 @@ void run_plot0(Int_t runnum=21,Int_t viewEvent = 1975)
   Int_t    maxmeshpos=0;
   Double_t meshthresh=200;
   Bool_t is2B=kFALSE;
+
+  TRandom randGen;
   ofstream myfile;
   myfile.open ("stuff.txt");
 
@@ -437,7 +449,7 @@ void run_plot0(Int_t runnum=21,Int_t viewEvent = 1975)
   TFileCollection *filecol = new TFileCollection();
   TString FileNameHead_num;
   TString FileNameHead_chain;
-  TString FilePath = workdir + "/macro/10Be/sim/";
+  TString FilePath = workdir + "/macro/10Be/";
   TString FileNameTail = ".root";
   TString FileName     = FilePath + FileNameHead + FileNameTail;
   Int_t file_ini=runnum;
@@ -477,7 +489,7 @@ void run_plot0(Int_t runnum=21,Int_t viewEvent = 1975)
       deltaE=0;
       for(Int_t i=512;i>0;i--){
         if(MeshArray[i]>meshthresh){
-          Vertex->Fill(i);
+          //Vertex->Fill(i);
           deltaE=i;
           break;
         }
@@ -485,22 +497,24 @@ void run_plot0(Int_t runnum=21,Int_t viewEvent = 1975)
 
       for(Int_t i=512;i>0;i--){
         if(MeshArray[i]>5*meshthresh){
-          Vertex1->Fill(i);
+          //Vertex1->Fill(i);
           //deltaE=i;
           break;
         }
       }
 
 
-      if(evnt==viewEvent)cout<<trackVector.size()<<endl;
+      //if(evnt==viewEvent)cout<<trackVector.size()<<endl;
       RedChi2.clear();
       trackquads.clear();
       maxrad.clear();
       maxradvec.clear();
       extrapoints.clear();
+      //Vertex->Fill(trackVector.size());
       if(trackVector.size()>0){
         for(Int_t i=0;i<trackVector.size();i++){
           RedChi2.push_back(trackVector.at(i).GetMinimum()/double(trackVector.at(i).GetHitArray()->size())); //calculate Reduced Chi square
+          trackVector.at(i).SetAngleZAxis(trackVector.at(i).GetAngleZAxis()-2.5*TMath::DegToRad());
           maxrad.push_back(0.0);
           maxradvec.push_back(zero);
           //Vertex->Fill(RedChi2.at(i));
@@ -559,7 +573,7 @@ void run_plot0(Int_t runnum=21,Int_t viewEvent = 1975)
           j++;
 
         }
-        if(trackVector.at(i).GetAngleZAxis()<0.08){//}||RedChi2.at(i)>maxchi2){
+        if(trackVector.at(i).GetAngleZAxis()<5.0*TMath::DegToRad()||trackVector.at(i).GetAngleZAxis()>85.0*TMath::DegToRad()){//}||RedChi2.at(i)>maxchi2){
           //removes beam-like tracks
           trackVector.erase(trackVector.begin()+i);
           RedChi2.erase(RedChi2.begin()+i);
@@ -624,52 +638,52 @@ void run_plot0(Int_t runnum=21,Int_t viewEvent = 1975)
       }
     }
 
-    if(evnt==viewEvent){
-      //view points and 3-d lines for the specified event
-      for(Int_t i=0; i<NumHits; i++){
-        ATHit *Hit = event->GetHit(i);
-        TVector3 coords= Hit->GetPosition();
-        //trackpic->Fill(coords.y(),coords.z());
-        trackpic->Fill(coords.x(),coords.y(),coords.z());
-        //cout<<coords.x()<<"\t"<<coords.y()<<"\t"<<coords.z()<<endl;
-      }
-      for(Int_t i=0;i<trackVector.size();i++){
-        std::vector<Double_t> parFit = trackVector.at(i).GetFitPar();
-        std::vector<ATHit>* trackhits = trackVector.at(i).GetHitArray();
-        TVector3 vertexcoords = trackVector.at(i).GetTrackVertex();
-        //cout<<"angle "<<trackVector.at(i).GetAngleZAxis()*TMath::RadToDeg()<<endl;
-        Double_t vertexrad = TMath::Sqrt(vertexcoords.x()*vertexcoords.x()+vertexcoords.y()*vertexcoords.y());
-        //cout<<vertexrad<<"\t"<<vertexcoords.z()<<endl;
-        //cout<<"quadrant "<<trackquads.at(i)<<endl;
-        //cout<<"number of hits \t"<<trackhits->size()<<endl;
-        // for(Int_t j=0; j<trackhits->size(); j++){
-        // TVector3 coords=trackhits->at(j).GetPosition();
-        // trackpic->Fill(coords.x(),coords.y(),coords.z());
-        // cout<<coords.x()<<"\t"<<coords.y()<<"\t"<<coords.z()<<endl;
-        // }
-        cout<<RedChi2.at(i)<<"\t"<<trackhits->size()<<endl;
-        cout<<trackVector.at(i).GetAngleZAxis()*TMath::RadToDeg()<<endl;
-        TPolyLine3D *dummy = new TPolyLine3D(2);
-        TPolyLine *dummy2d = new TPolyLine(2);
-        for (int j = 210; j<1210;++j){
-          double t = j-210;
-          double x,y,z,r;
-          x = parFit[0] + parFit[1]*t;
-          y = parFit[2] + parFit[3]*t;
-          r = TMath::Sqrt(x*x+y*y);
-          z = t;
-          //myfile<<x<<"\t"<<y<<endl;
-          dummy->SetPoint(j-210,x,y,z);
-          dummy2d->SetPoint(j-210,y,z);
-        }
-        dummy->SetLineColor(kRed);
-        dummy2d->SetLineColor(kRed);
-
-        tracksGraph.push_back(dummy);
-      }
-      //uncomment break statement below if the only point is viewing
-      break;
-    }
+    // if(evnt==viewEvent){
+    //   //view points and 3-d lines for the specified event
+    //   for(Int_t i=0; i<NumHits; i++){
+    //     ATHit *Hit = event->GetHit(i);
+    //     TVector3 coords= Hit->GetPosition();
+    //     //trackpic->Fill(coords.y(),coords.z());
+    //     trackpic->Fill(coords.x(),coords.y(),coords.z());
+    //     //cout<<coords.x()<<"\t"<<coords.y()<<"\t"<<coords.z()<<endl;
+    //   }
+    //   for(Int_t i=0;i<trackVector.size();i++){
+    //     std::vector<Double_t> parFit = trackVector.at(i).GetFitPar();
+    //     std::vector<ATHit>* trackhits = trackVector.at(i).GetHitArray();
+    //     TVector3 vertexcoords = trackVector.at(i).GetTrackVertex();
+    //     //cout<<"angle "<<trackVector.at(i).GetAngleZAxis()*TMath::RadToDeg()<<endl;
+    //     Double_t vertexrad = TMath::Sqrt(vertexcoords.x()*vertexcoords.x()+vertexcoords.y()*vertexcoords.y());
+    //     //cout<<vertexrad<<"\t"<<vertexcoords.z()<<endl;
+    //     //cout<<"quadrant "<<trackquads.at(i)<<endl;
+    //     //cout<<"number of hits \t"<<trackhits->size()<<endl;
+    //     // for(Int_t j=0; j<trackhits->size(); j++){
+    //     // TVector3 coords=trackhits->at(j).GetPosition();
+    //     // trackpic->Fill(coords.x(),coords.y(),coords.z());
+    //     // cout<<coords.x()<<"\t"<<coords.y()<<"\t"<<coords.z()<<endl;
+    //     // }
+    //     cout<<RedChi2.at(i)<<"\t"<<trackhits->size()<<endl;
+    //     cout<<trackVector.at(i).GetAngleZAxis()*TMath::RadToDeg()<<endl;
+    //     TPolyLine3D *dummy = new TPolyLine3D(2);
+    //     TPolyLine *dummy2d = new TPolyLine(2);
+    //     for (int j = 210; j<1210;++j){
+    //       double t = j-210;
+    //       double x,y,z,r;
+    //       x = parFit[0] + parFit[1]*t;
+    //       y = parFit[2] + parFit[3]*t;
+    //       r = TMath::Sqrt(x*x+y*y);
+    //       z = t;
+    //       //myfile<<x<<"\t"<<y<<endl;
+    //       dummy->SetPoint(j-210,x,y,z);
+    //       dummy2d->SetPoint(j-210,y,z);
+    //     }
+    //     dummy->SetLineColor(kRed);
+    //     dummy2d->SetLineColor(kRed);
+    //
+    //     tracksGraph.push_back(dummy);
+    //   }
+    //   //uncomment break statement below if the only point is viewing
+    //   break;
+    // }
     is2B=kFALSE;
     std::vector<Double_t> *Phi0Array;
     std::vector<Double_t> *Phi0RArray;
@@ -787,17 +801,23 @@ void run_plot0(Int_t runnum=21,Int_t viewEvent = 1975)
             }
             if(index>-500&&index<0){
               index=500+index;
-              energycm=2.0/7.0*(44.0+(EnergyMM[index]+(EnergyMM[index]-EnergyMM[index+1])*over));
+              energycm=2.0/7.0*(40.0+(EnergyMM[index]+(EnergyMM[index]-EnergyMM[index+1])*over));
               //myfile<<intVertex[0]<<"\t"<<energycm1<<index<<endl;
             }
             Q02_Kine->Fill(x,y);
-            if(TMath::Abs(wideElasticup->IsInside(anglea,angleb))){//}&&TMath::Abs(energycm-2.0/7.0*(ena+enb))<0.5)){
+            if(TMath::Abs(avg(Phi0Array)-avg(Phi2Array))<15.0){
+              is2B=kTRUE;//marking other two=body channels
+            }
+Q13_Kine->Fill(energycm,2.0/7.0*(ena+enb));
+Vertex->Fill(energycm-2.0/7.0*(ena+enb));
+
+            if(TMath::Abs(wideElasticup->IsInside(anglea,angleb))){
               is2B=kTRUE;
               PID->Fill(deltaE,totalE);
               thetacm=180-(2*anglea);
               if (thetacm<0) thetacm= thetacm+180.0;
               //calculating the energy from the center of mass position
-              cout<<evnt<<"\t"<<thetacm<<"\t"<<energycm<<endl;
+              //cout<<evnt<<"\t"<<thetacm<<"\t"<<energycm<<endl;
               if(1==1){//TMath::Abs(avg(Phi0Array)-avg(Phi2Array))<15.0){ //not currently cutting on phi, resolution not good enough
                 //Excitation_EL->Fill(energycm, 2.0/7.0*(ena+enb)); //resolution plot
                 Excitation_EL->Fill(thetacm,energycm); //excitation function, elastic
@@ -810,7 +830,7 @@ void run_plot0(Int_t runnum=21,Int_t viewEvent = 1975)
 
           }
         }
-        if(inelasticcut->IsInside(anglea,angleb)&&TMath::Abs(2.0/7.0*(ena+enb+3.36803)-energycm)<0.5){
+        if(inelasticcut->IsInside(anglea,angleb)&&cut1->IsInside(energycm,2.0/7.0*(ena+enb))){
           is2B=kTRUE;
           //Vertex1->Fill(enb);
 
@@ -1010,20 +1030,73 @@ void run_plot0(Int_t runnum=21,Int_t viewEvent = 1975)
           if(thetacm>0.0){
             //Excitation_EL->Fill(energycm, 2.0/7.0*(ena+enb));
             Excitation_IN->Fill(thetacm,energycm);
-            Q13_Kine->Fill(anglea,thetacm);
+            //Q13_Kine->Fill(anglea,thetacm);
           }
         }
         }
     }
   }
   if(trackVector.size()>2&&!is2B){
-    if(trackquads.at(0)!=trackquads.at(1)&&trackquads.at(1)!=trackquads.at(2)&&trackquads.at(2)!=trackquads.at(0)&&TMath::Abs(avg(Phi0Array)-avg(Phi2Array))>5.0){
-      Double_t range0 = (maxradvec[0]-trackVector.at(0).GetTrackVertex()).Mag();
-      Double_t range1 = (maxradvec[1]-trackVector.at(1).GetTrackVertex()).Mag();
-      Double_t range2 = (maxradvec[2]-trackVector.at(2).GetTrackVertex()).Mag();
+    Int_t i =0;
+    while(i<trackVector.size()){
+      Int_t j=i+1;
+      while(j<trackVector.size()){
+        if(TMath::Abs(trackVector.at(i).GetAngleZAxis()-trackVector.at(j).GetAngleZAxis())<1.0*TMath::DegToRad()){
+          trackVector.erase(trackVector.begin()+j);
+          maxradvec.erase(maxradvec.begin()+j);
+          maxrad.erase(maxrad.begin()+j);
+        }
+        else{
+          j++;
+        }
+      }
+      if(maxrad.at(i)>110.0){
+        trackVector.erase(trackVector.begin()+i);
+        maxradvec.erase(maxradvec.begin()+i);
+        maxrad.erase(maxrad.begin()+i);
+      }
+      else if(maxrad.at(i)<10.0){
+        trackVector.erase(trackVector.begin()+i);
+        maxradvec.erase(maxradvec.begin()+i);
+        maxrad.erase(maxrad.begin()+i);
+      }
+      else{
+        i++;
+      }
+    }
+    if(trackVector.size()==3){
+      Int_t first = randGen.Integer(3);
+      Double_t range0 = (maxradvec[first]-trackVector.at(first).GetTrackVertex()).Mag();
+      Double_t range1 = (maxradvec[(first+1)%3]-trackVector.at((first+1)%3).GetTrackVertex()).Mag();
+      Double_t range2 = (maxradvec[(first+2)%3]-trackVector.at((first+2)%3).GetTrackVertex()).Mag();
       Double_t sumrange= range0+range1+range2;
-    //  dalitz->Fill(range0/sumrange,range1/sumrange,range2/sumrange);
-      dalitz->Fill(trackVector.at(0).GetAngleZAxis()*TMath::RadToDeg(),trackVector.at(1).GetAngleZAxis()*TMath::RadToDeg(),trackVector.at(2).GetAngleZAxis()*TMath::RadToDeg());
+      Double_t fracrange0 = range0/sumrange;
+      Double_t fracrange1 = range1/sumrange;
+      Double_t fracrange2 = range2/sumrange;
+      Double_t dalitzx = TMath::Sqrt(3.0)/2.0*(fracrange1-fracrange0);
+      Double_t dalitzy = 1.0/2.0*(2*fracrange2-fracrange0-fracrange1);
+      //dalitz->Fill(fracrange0,fracrange1,fracrange2);
+
+      Double_t flipx;
+      Double_t flipy;
+      if(sumrange>100&&sumrange<255){
+    dalitz->Fill(trackVector.at(first).GetAngleZAxis()*TMath::RadToDeg(),trackVector.at((first+1)%3).GetAngleZAxis()*TMath::RadToDeg(),trackVector.at((first+2)%3).GetAngleZAxis()*TMath::RadToDeg());
+    if(a->Eval(dalitzx)<dalitzy){
+      flipx = 2*(dalitzx+dalitzy*slope)/(1+slope*slope)-dalitzx;
+      flipy = 2*slope*(dalitzx+dalitzy*slope)/(1+slope*slope)-dalitzy;
+      dalitzx = flipx;
+      dalitzy = flipy;
+    }
+    if(b->Eval(dalitzx)<dalitzy){
+      flipx = 2*(dalitzx - dalitzy*slope)/(1+slope*slope)-dalitzx;
+      flipy = -2*slope*(dalitzx-dalitzy*slope)/(1+slope*slope)-dalitzy;
+      dalitzx = flipx;
+      dalitzy = flipy;
+    }
+    dalitzx = TMath::Abs(dalitzx);
+    dalitz2d->Fill(dalitzx,dalitzy);
+    Vertex1->Fill(sumrange);
+  }
     }
   }
 
@@ -1061,20 +1134,25 @@ Kine_AngRec_AngSca->Draw("C");
 Kine_AngRec_AngSca_vert->Draw("C");
 Kine_AngRec_AngSca_In->Draw("C");
 Kine_AngRec_AngSca_In_vert->Draw("C");
-//wideElasticup->Draw("same");
+wideElasticup->Draw("same");
 //inelasticcut->Draw("same");
 leg->Draw();
 c3->cd(2);
 gPad->SetLogz();
 Q13_Kine->Draw("colz");
+cut1->Draw("same");
 
 
-c4->cd();
-//dalitz->Draw("same");
-trackpic->Draw();
-for(Int_t i =0;i<tracksGraph.size();i++){
-  tracksGraph.at(i)->Draw("same");
-}
+c4->cd(1);
+ dalitz->Draw("same");
+// trackpic->Draw();
+// for(Int_t i =0;i<tracksGraph.size();i++){
+//   tracksGraph.at(i)->Draw("same");
+// }
+c4->cd(2);
+dalitz2d->Draw("colz");
+a->Draw("same");
+b->Draw("same");
 
 c5->cd(1);
 //PhiCompare->Draw("*");
@@ -1082,13 +1160,13 @@ c5->cd(2);
 //PhiCompare1->Draw();
 
 c6->cd(1);
-gPad->SetLogz();
+Excitation_EL->SetBinErrorOption(TH1::EBinErrorOpt::kPoisson);
 Excitation_EL->Draw("colz");
 //corr->Draw("C");
 //cut1->Draw("same");
 //cut2->Draw("same");
 c6->cd(2);
-gPad->SetLogz();
+Excitation_IN->SetBinErrorOption(TH1::EBinErrorOpt::kPoisson);
 Excitation_IN->Draw("colz");
 
 TString plotsfile;

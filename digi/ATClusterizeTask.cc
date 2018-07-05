@@ -87,7 +87,7 @@ ATClusterizeTask::Exec(Option_t* option)
    Double_t  x = 0;
    Double_t  y = 0;
    Double_t  z = 0;
-   Double_t  fano = 0.17;
+   Double_t  fano = 2.0;
    Int_t     nElectrons   = 0;
    Double_t     eFlux        = 0;
    Int_t     genElectrons = 0;

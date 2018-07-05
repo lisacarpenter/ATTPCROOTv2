@@ -44,7 +44,23 @@ void run_sim_ana_v2(Int_t num_ev=16000)
 			std::sprintf(hra_name[i],"radang_%d",i);
 			RadAng[i]= new TH2D(hra_name[i],hra_name[i],100,0,180,100,0,200);
 		}
+    Double_t *ThetaCMS = new Double_t[1800];
+    Double_t *ThetaLabRec = new Double_t[1800];
+    Double_t *EnerLabRec = new Double_t[1800];
+    Double_t *ThetaLabSca = new Double_t[1800];
+    Double_t *EnerLabSca = new Double_t[1800];
+    TString fileKine="../Kinematics/Decay_kinematics/10Be_4He_19MeV.txt";
+    std::ifstream *kineStr = new std::ifstream(fileKine.Data());
+    Int_t numKin=0;
 
+    if(!kineStr->fail()){
+      while(!kineStr->eof()){
+        *kineStr>>ThetaCMS[numKin]>>ThetaLabRec[numKin]>>EnerLabRec[numKin]>>ThetaLabSca[numKin]>>EnerLabSca[numKin];
+        numKin++;
+      }
+    }else if(kineStr->fail()) std::cout<<" Warning : No Kinematics file found for this reaction! Please run the macro on $SIMPATH/macro/Kinematics/Decay_kinematics/Mainrel.cxx"<<std::endl;
+    TGraph *Kine_AngRec_AngSca = new TGraph(numKin,ThetaLabRec,ThetaLabSca);
+    TGraph *Kine_AngRec_AngSca_vert = new TGraph(numKin,ThetaLabSca,ThetaLabRec);
 
 
     TCanvas *c1 = new TCanvas();
@@ -301,7 +317,8 @@ void run_sim_ana_v2(Int_t num_ev=16000)
       c5->cd(1);
       //rad->Draw();
 Q02_Kine->Draw("colz");
-
+Kine_AngRec_AngSca->Draw("C");
+Kine_AngRec_AngSca_vert->Draw("C");
 
 
 }

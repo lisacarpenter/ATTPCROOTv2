@@ -1,4 +1,4 @@
-void run_eve_proto_lite(TString  InputDataFile = "10Be_2013_run0021.root",TString  OutputDataFile = "output_proto.reco_display.root", TString unpackDir="10Be/sim/")
+void run_eve_proto_lite(TString  InputDataFile = "attpcsim_proto.root",TString  OutputDataFile = "output_proto.reco_display.root", TString unpackDir="examples/")
 {
 
    TString dir = getenv("VMCWORKDIR");

@@ -1,4 +1,5 @@
 void run_sim_2B(Int_t nEvents = 10000, TString mcEngine = "TGeant4")
+
 {
 
   TString dir = getenv("VMCWORKDIR");
@@ -76,9 +77,10 @@ void run_sim_2B(Int_t nEvents = 10000, TString mcEngine = "TGeant4")
 	        Double_t px = 0.000/a;  // X-Momentum / per nucleon!!!!!!
 	        Double_t py = 0.000/a;  // Y-Momentum / per nucleon!!!!!!
 	        Double_t pz = 0.895/a;  // Z-Momentum / per nucleon!!!!!!
+
   	        Double_t BExcEner = 0.0;
                 Double_t Bmass = 9.3255; //Mass in GeV
-                Double_t NomEnergy = 43.0; //Nominal Energy of the beam: Only used for cross section calculation (Tracking energy is determined with momentum). TODO: Change this to the energy after the IC
+                Double_t NomEnergy = 40.0; //Nominal Energy of the beam: Only used for cross section calculation (Tracking energy is determined with momentum). TODO: Change this to the energy after the IC
                 Double_t TargetMass = 3.7284;//Mass in GeV
 
 
@@ -141,7 +143,7 @@ void run_sim_2B(Int_t nEvents = 10000, TString mcEngine = "TGeant4")
 		  Pyp.push_back(0.0);
 		  Pzp.push_back(0.0);
 		  Mass.push_back(9.3255);
-		  ExE.push_back(0.0);
+		  ExE.push_back(3.36803);
 
 
                   // ---- Recoil -----
