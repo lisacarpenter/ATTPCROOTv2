@@ -430,6 +430,17 @@ Bool_t ATTPC3Body::ReadEvent(FairPrimaryGenerator* primGen) {
           std::cout << " 2nd Recoil energy:" << gATVP->GetBURes2E() << " MeV" << std::endl;
           std::cout << " 2nd Recoiled angle:"  << gATVP->GetBURes2A() << " deg" << std::endl;
         }
+        else{
+          std::cout<< "=====No three-body decay====="<<std::endl;
+          fPx.at(4) = 0.0;
+          fPy.at(4) = 0.0;
+          fPz.at(4) = 0.0;
+
+          fPx.at(5) = 0.0;
+          fPy.at(5) = 0.0;
+          fPz.at(5) = 0.0;
+
+        }
       }
 
 

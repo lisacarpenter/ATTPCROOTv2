@@ -1,4 +1,4 @@
-void run_sim_3B(Int_t nEvents = 10000, TString mcEngine = "TGeant4")
+void run_sim_3B(Int_t nEvents = 50000, TString mcEngine = "TGeant4")
 
 {
 
@@ -137,24 +137,24 @@ void run_sim_3B(Int_t nEvents = 10000, TString mcEngine = "TGeant4")
 
                   //--- Scattered -----
                   Zp.push_back(4); // 40Ar TRACKID=1
-	 	  Ap.push_back(10); //
+	 	  Ap.push_back(8); //
 		  Qp.push_back(4);
 		  Pxp.push_back(0.0);
 		  Pyp.push_back(0.0);
 		  Pzp.push_back(0.0);
-		  Mass.push_back(9.3255);
-		  ExE.push_back(3.36803);
+		  Mass.push_back(7.4519);
+		  ExE.push_back(0.0);
 
 
                   // ---- Recoil -----
-		  Zp.push_back(2); // p  TRACKID=2
-		  Ap.push_back(4); //
-		  Qp.push_back(2); //
-		  Pxp.push_back(0.0);
-                  Pyp.push_back(0.0);
-		  Pzp.push_back(0.0);
-                  Mass.push_back(3.7284);
-		  ExE.push_back(0.0);//In MeV
+     Zp.push_back(2); // p  TRACKID=2
+    Ap.push_back(6); //
+    Qp.push_back(2); //
+    Pxp.push_back(0.0);
+                 Pyp.push_back(0.0);
+    Pzp.push_back(0.0);
+                 Mass.push_back(5.60656);
+    ExE.push_back(0.0);//In MeV
 
       //first particle in decay
       Zp.push_back(2); // p  TRACKID=2
@@ -167,14 +167,14 @@ void run_sim_3B(Int_t nEvents = 10000, TString mcEngine = "TGeant4")
      ExE.push_back(0.0);//In MeV
 
      //second particle to decay
-     Zp.push_back(2); // p  TRACKID=2
-    Ap.push_back(6); //
-    Qp.push_back(2); //
-    Pxp.push_back(0.0);
-                 Pyp.push_back(0.0);
-    Pzp.push_back(0.0);
-                 Mass.push_back(5.60656);
-    ExE.push_back(0.0);//In MeV
+      Zp.push_back(2); // p  TRACKID=2
+     Ap.push_back(4); //
+     Qp.push_back(2); //
+     Pxp.push_back(0.0);
+                  Pyp.push_back(0.0);
+     Pzp.push_back(0.0);
+                  Mass.push_back(3.7284);
+     ExE.push_back(0.0);//In MeV
 
                   Double_t ThetaMinCMS = 0.1;
                   Double_t ThetaMaxCMS = 180.0;
