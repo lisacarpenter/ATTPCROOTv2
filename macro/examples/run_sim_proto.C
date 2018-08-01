@@ -1,4 +1,4 @@
-void run_sim_proto(Int_t nEvents = 10000, TString mcEngine = "TGeant4")
+void run_sim_proto(Int_t nEvents = 100, TString mcEngine = "TGeant4")
 {
 
   TString dir = getenv("VMCWORKDIR");
@@ -76,13 +76,13 @@ void run_sim_proto(Int_t nEvents = 10000, TString mcEngine = "TGeant4")
 	          Double_t px = 0.001/a;  // X-Momentum / per nucleon!!!!!!
 	          Double_t py = 0.001/a;  // Y-Momentum / per nucleon!!!!!!
 	          Double_t pz = 0.895/a;  // Z-Momentum / per nucleon!!!!!!
-  		  Double_t ExcEner = 0.0;
+  		  Double_t BExcEner = 0.0;
                   Double_t Bmass = 9.32755; //Mass in GeV
                   Double_t NomEnergy = 35.0; //Nominal Energy of the beam: Only used for cross section calculation (Tracking energy is determined with momentum). Must be consistent with pz
                   Double_t TargetMass = 3.72840;//Mass in GeV
 
 
-	          ATTPCIonGenerator* ionGen = new ATTPCIonGenerator("Ion",z,a,q,m,px,py,pz,ExcEner,Bmass,NomEnergy);
+	          ATTPCIonGenerator* ionGen = new ATTPCIonGenerator("Ion",z,a,q,m,px,py,pz,BExcEner,Bmass,NomEnergy);
 	          ionGen->SetSpotRadius(1,-20,0);
 	          // add the ion generator
 
@@ -102,6 +102,7 @@ void run_sim_proto(Int_t nEvents = 10000, TString mcEngine = "TGeant4")
  		  std::vector<Double_t> Pxp; //Px momentum X
 		  std::vector<Double_t> Pyp; //Py momentum Y
 		  std::vector<Double_t> Pzp; //Pz momentum Z
+      std::vector<Double_t> ExE; //Excitation Energy
                   std::vector<Double_t> Mass; // Masses of the reaction products
  		  Double_t ResEner; // Energy of the beam
 
@@ -119,6 +120,7 @@ void run_sim_proto(Int_t nEvents = 10000, TString mcEngine = "TGeant4")
 		  Pxp.push_back(0.0);
 	          Pyp.push_back(0.0);
 		  Pzp.push_back(0.0);
+      ExE.push_back(0.0);
                   Mass.push_back(5606.56); //In MeV
 
 		  // ---- Particle 2 -----
@@ -128,6 +130,7 @@ void run_sim_proto(Int_t nEvents = 10000, TString mcEngine = "TGeant4")
 		  Pxp.push_back(0.0);
 		  Pyp.push_back(0.0);
 		  Pzp.push_back(0.0);
+      ExE.push_back(0.0);
 		  Mass.push_back(3728.40);
 
 		  // ----- Particle 3 -----
@@ -137,12 +140,13 @@ void run_sim_proto(Int_t nEvents = 10000, TString mcEngine = "TGeant4")
 		  Pxp.push_back(0.0);
 		  Pyp.push_back(0.0);
 		  Pzp.push_back(0.0);
+      ExE.push_back(0.0);
 		  Mass.push_back(3728.40);
 
 
 
 
-        ATTPCIonPhaseSpace* ReacDecay = new ATTPCIonPhaseSpace("Phase",&Zp,&Ap,&Qp,mult,&Pxp,&Pyp,&Pzp,&Mass,ResEner,z,a,px,py,pz,Bmass,TargetMass);
+        ATTPCIonPhaseSpace* ReacDecay = new ATTPCIonPhaseSpace("Phase",&Zp,&Ap,&Qp,mult,&Pxp,&Pyp,&Pzp,&ExE,&Mass,ResEner,z,a,px,py,pz,Bmass,TargetMass);
         primGen->AddGenerator(ReacDecay);
 
 

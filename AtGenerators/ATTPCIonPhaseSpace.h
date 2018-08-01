@@ -28,9 +28,9 @@ class ATTPCIonPhaseSpace : public FairGenerator
 
 
 
-  /** Default constructor 
+  /** Default constructor
    ** For the generation of ions with atomic number z and mass number a.
-   ** By default, the mass equals a times the proton mass and the 
+   ** By default, the mass equals a times the proton mass and the
    ** excitation energy is zero. This can be changed with the
    ** respective modifiers.
    **@param z         Atomic number
@@ -40,8 +40,8 @@ class ATTPCIonPhaseSpace : public FairGenerator
    **@param px,py,pz  Momentum components [GeV] per nucleon!
    **@param vx,vy,vz  Vertex coordinates [cm]
    **/
-  ATTPCIonPhaseSpace(const char* name,std::vector<Int_t> *z,std::vector<Int_t> *a,std::vector<Int_t> *q, Int_t mult, std::vector<Double_t> *px, 
-          std::vector<Double_t>* py,std::vector<Double_t> *pz, std::vector<Double_t> *mass , Double_t ResEner, Int_t ZB, Int_t AB, Double_t PxB, Double_t PyB, Double_t PzB, Double_t BMass, Double_t TMass);
+  ATTPCIonPhaseSpace(const char* name,std::vector<Int_t> *z,std::vector<Int_t> *a,std::vector<Int_t> *q, Int_t mult, std::vector<Double_t> *px,
+          std::vector<Double_t>* py,std::vector<Double_t> *pz, std::vector<Double_t> *Ex, std::vector<Double_t> *mass , Double_t ResEner, Int_t ZB, Int_t AB, Double_t PxB, Double_t PyB, Double_t PzB, Double_t BMass, Double_t TMass);
 
 
   ATTPCIonPhaseSpace(const ATTPCIonPhaseSpace&);
@@ -76,13 +76,12 @@ private:
   Bool_t fIsDecay;
   Double_t fBeamMass;
   Double_t fTargetMass;
- 
+
 
 
   ClassDef(ATTPCIonPhaseSpace,2)
 
-}; 
+};
 
 
 #endif
-

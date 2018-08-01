@@ -94,7 +94,7 @@ TGraph2D *line3d(std::vector<Double_t> parFit ){
   return graph;
 }
 
-void run_plot0(Int_t runnum=21,Int_t viewEvent = 1975)
+void run_plot0(Int_t runnum=21,Int_t viewEvent = -1)
 {
 
   //filing in theoretical kinematic lines...
@@ -145,7 +145,6 @@ void run_plot0(Int_t runnum=21,Int_t viewEvent = 1975)
   TCanvas *c4 = new TCanvas("c4","c4",200,10,700,700);
   c4->Divide(2,1);
   TCanvas *c5 = new TCanvas("c5","c5",200,10,700,700);
-  c5->Divide(2,1);
   TCanvas *c6 = new TCanvas("c6","c6",1000,500);
   c6->Divide(2,1);
 
@@ -414,6 +413,7 @@ void run_plot0(Int_t runnum=21,Int_t viewEvent = 1975)
 
   std::vector<double> RedChi2;
   std::vector<double> maxrad;
+  std::vector<double> minrad;
   std::vector<TVector3> maxradvec;
   std::vector<TVector3> extrapoints;
   Int_t bestindex;
@@ -508,6 +508,7 @@ void run_plot0(Int_t runnum=21,Int_t viewEvent = 1975)
       RedChi2.clear();
       trackquads.clear();
       maxrad.clear();
+      minrad.clear();
       maxradvec.clear();
       extrapoints.clear();
       //Vertex->Fill(trackVector.size());
@@ -517,6 +518,7 @@ void run_plot0(Int_t runnum=21,Int_t viewEvent = 1975)
           trackVector.at(i).SetAngleZAxis(trackVector.at(i).GetAngleZAxis()-2.5*TMath::DegToRad());
           maxrad.push_back(0.0);
           maxradvec.push_back(zero);
+          minrad.push_back(125.0);
           //Vertex->Fill(RedChi2.at(i));
           //Vertex->Fill(trackVector.at(i).GetAngleZAxis()*TMath::RadToDeg());
           //myfile<<trackVector.at(i).GetMinimum()<<"\t"<<trackVector.at(i).GetHitArray()->size()<<"\t"<<RedChi2.at(i)<<endl;
@@ -555,6 +557,9 @@ void run_plot0(Int_t runnum=21,Int_t viewEvent = 1975)
               maxrad[i]=hitrad;
               maxradvec[i]=coords1;
             }
+            if(hitrad<minrad.at(i)){
+              minrad[i]=hitrad;
+            }
           }
           numspark.push_back(mode2(zlist));//calclulate the maximum number of points that are at the same z value
           TGraph2D *dummy3d = line3d(parFit);
@@ -582,6 +587,7 @@ void run_plot0(Int_t runnum=21,Int_t viewEvent = 1975)
           numspark.erase(numspark.begin()+i);
           maxrad.erase(maxrad.begin()+i);
           maxradvec.erase(maxradvec.begin()+i);
+          minrad.erase(minrad.begin()+i);
         }
         else if((trackhits->size()/2)<=numgood.at(i).size()){
           //if more than half the points in a track also fit with a different track, remove it
@@ -596,6 +602,7 @@ void run_plot0(Int_t runnum=21,Int_t viewEvent = 1975)
           numspark.erase(numspark.begin()+i);
           maxrad.erase(maxrad.begin()+i);
           maxradvec.erase(maxradvec.begin()+i);
+          minrad.erase(minrad.begin()+i);
         }
         else if(numspark.at(i)>trackhits->size()/2){
           //if most of the track is at the same z-value, it is a spark, remove it
@@ -606,17 +613,19 @@ void run_plot0(Int_t runnum=21,Int_t viewEvent = 1975)
           numspark.erase(numspark.begin()+i);
           maxrad.erase(maxrad.begin()+i);
           maxradvec.erase(maxradvec.begin()+i);
+          minrad.erase(minrad.begin()+i);
         }
-        // else if(vertexrad>125.0||vertexcoords.z()>offset||vertexcoords.z()<offset-500.0){
-        //   //remove tracks with non-physical vertex
-        //   trackVector.erase(trackVector.begin()+i);
-        //   RedChi2.erase(RedChi2.begin()+i);
-        //   trackquads.erase(trackquads.begin()+i);
-        //   numgood.erase(numgood.begin()+i);
-        //   numspark.erase(numspark.begin()+i);
-        //   maxrad.erase(maxrad.begin()+i);
-        //   maxradvec.erase(maxradvec.begin()+i);
-        // }
+        else if(minrad.at(i)>10.0){
+          //remove tracks with non-physical vertex
+          trackVector.erase(trackVector.begin()+i);
+          RedChi2.erase(RedChi2.begin()+i);
+          trackquads.erase(trackquads.begin()+i);
+          numgood.erase(numgood.begin()+i);
+          numspark.erase(numspark.begin()+i);
+          maxrad.erase(maxrad.begin()+i);
+          maxradvec.erase(maxradvec.begin()+i);
+          minrad.erase(minrad.begin()+i);
+        }
         else{
           i++;
         }
@@ -638,52 +647,19 @@ void run_plot0(Int_t runnum=21,Int_t viewEvent = 1975)
       }
     }
 
-    // if(evnt==viewEvent){
-    //   //view points and 3-d lines for the specified event
-    //   for(Int_t i=0; i<NumHits; i++){
-    //     ATHit *Hit = event->GetHit(i);
-    //     TVector3 coords= Hit->GetPosition();
-    //     //trackpic->Fill(coords.y(),coords.z());
-    //     trackpic->Fill(coords.x(),coords.y(),coords.z());
-    //     //cout<<coords.x()<<"\t"<<coords.y()<<"\t"<<coords.z()<<endl;
-    //   }
-    //   for(Int_t i=0;i<trackVector.size();i++){
-    //     std::vector<Double_t> parFit = trackVector.at(i).GetFitPar();
-    //     std::vector<ATHit>* trackhits = trackVector.at(i).GetHitArray();
-    //     TVector3 vertexcoords = trackVector.at(i).GetTrackVertex();
-    //     //cout<<"angle "<<trackVector.at(i).GetAngleZAxis()*TMath::RadToDeg()<<endl;
-    //     Double_t vertexrad = TMath::Sqrt(vertexcoords.x()*vertexcoords.x()+vertexcoords.y()*vertexcoords.y());
-    //     //cout<<vertexrad<<"\t"<<vertexcoords.z()<<endl;
-    //     //cout<<"quadrant "<<trackquads.at(i)<<endl;
-    //     //cout<<"number of hits \t"<<trackhits->size()<<endl;
-    //     // for(Int_t j=0; j<trackhits->size(); j++){
-    //     // TVector3 coords=trackhits->at(j).GetPosition();
-    //     // trackpic->Fill(coords.x(),coords.y(),coords.z());
-    //     // cout<<coords.x()<<"\t"<<coords.y()<<"\t"<<coords.z()<<endl;
-    //     // }
-    //     cout<<RedChi2.at(i)<<"\t"<<trackhits->size()<<endl;
-    //     cout<<trackVector.at(i).GetAngleZAxis()*TMath::RadToDeg()<<endl;
-    //     TPolyLine3D *dummy = new TPolyLine3D(2);
-    //     TPolyLine *dummy2d = new TPolyLine(2);
-    //     for (int j = 210; j<1210;++j){
-    //       double t = j-210;
-    //       double x,y,z,r;
-    //       x = parFit[0] + parFit[1]*t;
-    //       y = parFit[2] + parFit[3]*t;
-    //       r = TMath::Sqrt(x*x+y*y);
-    //       z = t;
-    //       //myfile<<x<<"\t"<<y<<endl;
-    //       dummy->SetPoint(j-210,x,y,z);
-    //       dummy2d->SetPoint(j-210,y,z);
-    //     }
-    //     dummy->SetLineColor(kRed);
-    //     dummy2d->SetLineColor(kRed);
-    //
-    //     tracksGraph.push_back(dummy);
-    //   }
-    //   //uncomment break statement below if the only point is viewing
-    //   break;
-    // }
+    if(evnt==viewEvent){
+      //view points and 3-d lines for the specified event
+      for(Int_t i=0; i<NumHits; i++){
+        ATHit *Hit = event->GetHit(i);
+        TVector3 coords= Hit->GetPosition();
+        //trackpic->Fill(coords.y(),coords.z());
+        trackpic->Fill(coords.x(),coords.y(),coords.z());
+        //cout<<coords.x()<<"\t"<<coords.y()<<"\t"<<coords.z()<<endl;
+      }
+
+      //uncomment break statement below if the only point is viewing
+      //break;
+    }
     is2B=kFALSE;
     std::vector<Double_t> *Phi0Array;
     std::vector<Double_t> *Phi0RArray;
@@ -805,11 +781,11 @@ void run_plot0(Int_t runnum=21,Int_t viewEvent = 1975)
               //myfile<<intVertex[0]<<"\t"<<energycm1<<index<<endl;
             }
             Q02_Kine->Fill(x,y);
-            if(TMath::Abs(avg(Phi0Array)-avg(Phi2Array))<15.0){
+            if(TMath::Abs(avg(Phi0Array)-avg(Phi2Array))<5.0){
               is2B=kTRUE;//marking other two=body channels
             }
-Q13_Kine->Fill(energycm,2.0/7.0*(ena+enb));
-Vertex->Fill(energycm-2.0/7.0*(ena+enb));
+            Q13_Kine->Fill(energycm,2.0/7.0*(ena+enb));
+            Vertex->Fill(energycm-2.0/7.0*(ena+enb));
 
             if(TMath::Abs(wideElasticup->IsInside(anglea,angleb))){
               is2B=kTRUE;
@@ -821,297 +797,338 @@ Vertex->Fill(energycm-2.0/7.0*(ena+enb));
               if(1==1){//TMath::Abs(avg(Phi0Array)-avg(Phi2Array))<15.0){ //not currently cutting on phi, resolution not good enough
                 //Excitation_EL->Fill(energycm, 2.0/7.0*(ena+enb)); //resolution plot
                 Excitation_EL->Fill(thetacm,energycm); //excitation function, elastic
-            //    if(cut1->IsInside(energycm, 2.0/7.0*(ena+enb))){
-            //    Q02_Kine->Fill(x,y);
-            //   }
-            //   if(cut2->IsInside(energycm, 2.0/7.0*(ena+enb))){
-            //   Q13_Kine->Fill(x,y);
-            // }
+                //    if(cut1->IsInside(energycm, 2.0/7.0*(ena+enb))){
+                //    Q02_Kine->Fill(x,y);
+                //   }
+                //   if(cut2->IsInside(energycm, 2.0/7.0*(ena+enb))){
+                //   Q13_Kine->Fill(x,y);
+                // }
+
+              }
+            }
+            if(inelasticcut->IsInside(anglea,angleb)&&cut1->IsInside(energycm,2.0/7.0*(ena+enb))){
+              is2B=kTRUE;
+              //Vertex1->Fill(enb);
+
+              Double_t energylab = 7.0/2.0*energycm;
+              Double_t thetalow=0.0;
+              Double_t thetahigh=0.0;
+              if(energylab>=43.0&&energylab<45.0){
+                for(Int_t i=0;i<100;i++){
+                  if(enb>=enlist43[i]){
+                    thetalow=anglist43[i]+(anglist43[i+1]-anglist43[i])*(enb-enlist43[i])/(enlist43[i+1]-enlist43[i]);
+                    break;
+                  }
+                }
+                for(Int_t i=0;i<100;i++){
+                  if(enb>=enlist45[i]){
+                    thetahigh=anglist45[i]+(anglist45[i+1]-anglist45[i])*(enb-enlist45[i])/(enlist45[i+1]-enlist45[i]);
+                    break;
+                  }
+                }
+                thetacm = thetalow + (thetahigh-thetalow)*(energylab-43.0)/(45.0-43.0);
+              }
+              if(energylab>=40.0&&energylab<43.0){
+                for(Int_t i=0;i<100;i++){
+                  if(enb>=enlist40[i]){
+                    thetalow=anglist40[i]+(anglist40[i+1]-anglist40[i])*(enb-enlist40[i])/(enlist40[i+1]-enlist40[i]);
+                    break;
+                  }
+                }
+                for(Int_t i=0;i<100;i++){
+                  if(enb>=enlist43[i]){
+                    thetahigh=anglist43[i]+(anglist43[i+1]-anglist43[i])*(enb-enlist43[i])/(enlist43[i+1]-enlist43[i]);
+                    break;
+                  }
+                }
+                thetacm = thetalow + (thetahigh-thetalow)*(energylab-40.0)/(43.0-40.0);
+              }
+              else if(energylab>=38.0&&energylab<40.0){
+                for(Int_t i=0;i<100;i++){
+                  if(enb>=enlist38[i]){
+                    thetalow=anglist38[i]+(anglist38[i+1]-anglist38[i])*(enb-enlist38[i])/(enlist38[i+1]-enlist38[i]);
+                    break;
+                  }
+                }
+                for(Int_t i=0;i<100;i++){
+                  if(enb>=enlist40[i]){
+                    thetahigh=anglist40[i]+(anglist40[i+1]-anglist40[i])*(enb-enlist40[i])/(enlist40[i+1]-enlist40[i]);
+                    break;
+                  }
+                }
+                thetacm = thetalow + (thetahigh-thetalow)*(energylab-38.0)/(40.0-38.0);
+              }
+              else if(energylab>=35.0&&energylab<38.0){
+                for(Int_t i=0;i<100;i++){
+                  if(enb>=enlist35[i]){
+                    thetalow=anglist35[i]+(anglist35[i+1]-anglist35[i])*(enb-enlist35[i])/(enlist35[i+1]-enlist35[i]);
+                    break;
+                  }
+                }
+                for(Int_t i=0;i<100;i++){
+                  if(enb>=enlist38[i]){
+                    thetahigh=anglist38[i]+(anglist38[i+1]-anglist38[i])*(enb-enlist38[i])/(enlist38[i+1]-enlist38[i]);
+                    break;
+                  }
+                }
+                thetacm = thetalow + (thetahigh-thetalow)*(energylab-35.0)/(38.0-35.0);
+              }
+              else if(energylab>=33.0&&energylab<35.0){
+                for(Int_t i=0;i<100;i++){
+                  if(enb>=enlist33[i]){
+                    thetalow=anglist33[i]+(anglist33[i+1]-anglist33[i])*(enb-enlist33[i])/(enlist33[i+1]-enlist33[i]);
+                    break;
+                  }
+                }
+                for(Int_t i=0;i<100;i++){
+                  if(enb>=enlist35[i]){
+                    thetahigh=anglist35[i]+(anglist35[i+1]-anglist35[i])*(enb-enlist35[i])/(enlist35[i+1]-enlist35[i]);
+                    break;
+                  }
+                }
+                thetacm = thetalow + (thetahigh-thetalow)*(energylab-33.0)/(35.0-33.0);
+              }
+              else if(energylab>=30.0&&energylab<33.0){
+                for(Int_t i=0;i<100;i++){
+                  if(enb>=enlist30[i]){
+                    thetalow=anglist30[i]+(anglist30[i+1]-anglist30[i])*(enb-enlist30[i])/(enlist30[i+1]-enlist30[i]);
+                    break;
+                  }
+                }
+                for(Int_t i=0;i<100;i++){
+                  if(enb>=enlist33[i]){
+                    thetahigh=anglist33[i]+(anglist33[i+1]-anglist33[i])*(enb-enlist33[i])/(enlist33[i+1]-enlist33[i]);
+                    break;
+                  }
+                }
+                thetacm = thetalow + (thetahigh-thetalow)*(energylab-30.0)/(33.0-30.0);
+              }
+              else if(energylab>=28.0&&energylab<30.0){
+                for(Int_t i=0;i<100;i++){
+                  if(enb>=enlist28[i]){
+                    thetalow=anglist28[i]+(anglist28[i+1]-anglist28[i])*(enb-enlist28[i])/(enlist28[i+1]-enlist28[i]);
+                    break;
+                  }
+                }
+                for(Int_t i=0;i<100;i++){
+                  if(enb>=enlist30[i]){
+                    thetahigh=anglist30[i]+(anglist30[i+1]-anglist30[i])*(enb-enlist30[i])/(enlist30[i+1]-enlist30[i]);
+                    break;
+                  }
+                }
+                thetacm = thetalow + (thetahigh-thetalow)*(energylab-28.0)/(30.0-28.0);
+              }
+              else if(energylab>=25.0&&energylab<28.0){
+                for(Int_t i=0;i<100;i++){
+                  if(enb>=enlist25[i]){
+                    thetalow=anglist25[i]+(anglist25[i+1]-anglist25[i])*(enb-enlist25[i])/(enlist25[i+1]-enlist25[i]);
+                    break;
+                  }
+                }
+                for(Int_t i=0;i<100;i++){
+                  if(enb>=enlist28[i]){
+                    thetahigh=anglist28[i]+(anglist28[i+1]-anglist28[i])*(enb-enlist28[i])/(enlist28[i+1]-enlist28[i]);
+                    break;
+                  }
+                }
+                thetacm = thetalow + (thetahigh-thetalow)*(energylab-25.0)/(28.0-25.0);
+              }
+              else if(energylab>=23.0&&energylab<25.0){
+                for(Int_t i=0;i<100;i++){
+                  if(enb>=enlist23[i]){
+                    thetalow=anglist23[i]+(anglist23[i+1]-anglist23[i])*(enb-enlist23[i])/(enlist23[i+1]-enlist23[i]);
+                    break;
+                  }
+                }
+                for(Int_t i=0;i<100;i++){
+                  if(enb>=enlist25[i]){
+                    thetahigh=anglist25[i]+(anglist25[i+1]-anglist25[i])*(enb-enlist25[i])/(enlist25[i+1]-enlist25[i]);
+                    break;
+                  }
+                }
+                thetacm = thetalow + (thetahigh-thetalow)*(energylab-23.0)/(25.0-23.0);
+              }
+              else if(energylab>=20.0&&energylab<23.0){
+                for(Int_t i=0;i<100;i++){
+                  if(enb>=enlist20[i]){
+                    thetalow=anglist20[i]+(anglist20[i+1]-anglist20[i])*(enb-enlist20[i])/(enlist20[i+1]-enlist20[i]);
+                    break;
+                  }
+                }
+                for(Int_t i=0;i<100;i++){
+                  if(enb>=enlist23[i]){
+                    thetahigh=anglist23[i]+(anglist23[i+1]-anglist23[i])*(enb-enlist23[i])/(enlist23[i+1]-enlist23[i]);
+                    break;
+                  }
+                }
+                thetacm = thetalow + (thetahigh-thetalow)*(energylab-20.0)/(23.0-20.0);
+              }
+              else if(energylab>=18.0&&energylab<20.0){
+                for(Int_t i=0;i<100;i++){
+                  if(enb>=enlist18[i]){
+                    thetalow=anglist18[i]+(anglist18[i+1]-anglist18[i])*(enb-enlist18[i])/(enlist18[i+1]-enlist18[i]);
+                    break;
+                  }
+                }
+                for(Int_t i=0;i<100;i++){
+                  if(enb>=enlist20[i]){
+                    thetahigh=anglist20[i]+(anglist20[i+1]-anglist20[i])*(enb-enlist20[i])/(enlist20[i+1]-enlist20[i]);
+                    break;
+                  }
+                }
+                thetacm = thetalow + (thetahigh-thetalow)*(energylab-18.0)/(20.0-18.0);
+              }
+              else if(energylab>=15.0&&energylab<18.0){
+                for(Int_t i=0;i<100;i++){
+                  if(enb>=enlist15[i]){
+                    thetalow=anglist15[i]+(anglist15[i+1]-anglist15[i])*(enb-enlist15[i])/(enlist15[i+1]-enlist15[i]);
+                    break;
+                  }
+                }
+                for(Int_t i=0;i<100;i++){
+                  if(enb>=enlist18[i]){
+                    thetahigh=anglist18[i]+(anglist18[i+1]-anglist18[i])*(enb-enlist18[i])/(enlist18[i+1]-enlist18[i]);
+                    break;
+                  }
+                }
+                thetacm = thetalow + (thetahigh-thetalow)*(energylab-15.0)/(18.0-15.0);
+              }
+              else if(energylab>=0.0&&energylab<15.0){
+                for(Int_t i=0;i<100;i++){
+                  if(enb>=enlist15[i]){
+                    thetahigh=anglist15[i]+(anglist15[i+1]-anglist15[i])*(enb-enlist15[i])/(enlist15[i+1]-enlist15[i]);
+                    break;
+                  }
+                }
+                thetacm = thetalow + (thetahigh-thetalow)*(energylab-0.0)/(15.0-0.0);
+              }
+              thetacm=180-thetacm;
+              if(thetacm>0.0){
+                //Excitation_EL->Fill(energycm, 2.0/7.0*(ena+enb));
+                Excitation_IN->Fill(thetacm,energycm);
+                //Q13_Kine->Fill(anglea,thetacm);
+              }
+            }
+          }
+        }
+      }
+      if(trackVector.size()>2&&!is2B){
+        Int_t i =0;
+        while(i<trackVector.size()){
+          Int_t j=i+1;
+          while(j<trackVector.size()){
+            if(TMath::Abs(trackVector.at(i).GetAngleZAxis()-trackVector.at(j).GetAngleZAxis())<1.0*TMath::DegToRad()){
+              trackVector.erase(trackVector.begin()+j);
+              maxradvec.erase(maxradvec.begin()+j);
+              maxrad.erase(maxrad.begin()+j);
+            }
+            else{
+              j++;
+            }
+          }
+          if(maxrad.at(i)>110.0){
+            trackVector.erase(trackVector.begin()+i);
+            maxradvec.erase(maxradvec.begin()+i);
+            maxrad.erase(maxrad.begin()+i);
+          }
+          else if(maxrad.at(i)<10.0){
+            trackVector.erase(trackVector.begin()+i);
+            maxradvec.erase(maxradvec.begin()+i);
+            maxrad.erase(maxrad.begin()+i);
+          }
+          else{
+            i++;
+          }
+        }
+        if(trackVector.size()==3){
+          Int_t first = randGen.Integer(3);
+          Double_t range0 = (maxradvec[first]-trackVector.at(first).GetTrackVertex()).Mag();
+          Double_t range1 = (maxradvec[(first+1)%3]-trackVector.at((first+1)%3).GetTrackVertex()).Mag();
+          Double_t range2 = (maxradvec[(first+2)%3]-trackVector.at((first+2)%3).GetTrackVertex()).Mag();
+          Double_t sumrange= range0+range1+range2;
+          Double_t fracrange0 = range0/sumrange;
+          Double_t fracrange1 = range1/sumrange;
+          Double_t fracrange2 = range2/sumrange;
+          Double_t dalitzx = TMath::Sqrt(3.0)/2.0*(fracrange1-fracrange0);
+          Double_t dalitzy = 1.0/2.0*(2*fracrange2-fracrange0-fracrange1);
+          //dalitz->Fill(fracrange0,fracrange1,fracrange2);
+
+          Double_t flipx;
+          Double_t flipy;
+          if(sumrange>100&&sumrange<255){
+            dalitz->Fill(trackVector.at(first).GetAngleZAxis()*TMath::RadToDeg(),trackVector.at((first+1)%3).GetAngleZAxis()*TMath::RadToDeg(),trackVector.at((first+2)%3).GetAngleZAxis()*TMath::RadToDeg());
+            if(a->Eval(dalitzx)<dalitzy){
+              flipx = 2*(dalitzx+dalitzy*slope)/(1+slope*slope)-dalitzx;
+              flipy = 2*slope*(dalitzx+dalitzy*slope)/(1+slope*slope)-dalitzy;
+              dalitzx = flipx;
+              dalitzy = flipy;
+            }
+            if(b->Eval(dalitzx)<dalitzy){
+              flipx = 2*(dalitzx - dalitzy*slope)/(1+slope*slope)-dalitzx;
+              flipy = -2*slope*(dalitzx-dalitzy*slope)/(1+slope*slope)-dalitzy;
+              dalitzx = flipx;
+              dalitzy = flipy;
+            }
+            dalitzx = TMath::Abs(dalitzx);
+            dalitz2d->Fill(dalitzx,dalitzy);
+            Vertex1->Fill(sumrange);
+            if(TMath::Abs(dalitzx-TMath::Abs(dalitzy))<0.1){
+              cout<<evnt<<endl;
+            }
+            if(evnt==viewEvent){
+              for(Int_t i=0;i<trackVector.size();i++){
+                std::vector<Double_t> parFit = trackVector.at(i).GetFitPar();
+                std::vector<ATHit>* trackhits = trackVector.at(i).GetHitArray();
+                TVector3 vertexcoords = trackVector.at(i).GetTrackVertex();
+                //cout<<"angle "<<trackVector.at(i).GetAngleZAxis()*TMath::RadToDeg()<<endl;
+                Double_t vertexrad = TMath::Sqrt(vertexcoords.x()*vertexcoords.x()+vertexcoords.y()*vertexcoords.y());
+                //cout<<vertexrad<<"\t"<<vertexcoords.z()<<endl;
+                //cout<<"quadrant "<<trackquads.at(i)<<endl;
+                //cout<<"number of hits \t"<<trackhits->size()<<endl;
+                // for(Int_t j=0; j<trackhits->size(); j++){
+                // TVector3 coords=trackhits->at(j).GetPosition();
+                // trackpic->Fill(coords.x(),coords.y(),coords.z());
+                // cout<<coords.x()<<"\t"<<coords.y()<<"\t"<<coords.z()<<endl;
+                // }
+                cout<<RedChi2.at(i)<<"\t"<<trackhits->size()<<endl;
+                cout<<trackVector.at(i).GetAngleZAxis()*TMath::RadToDeg()<<endl;
+                TPolyLine3D *dummy = new TPolyLine3D(2);
+                TPolyLine *dummy2d = new TPolyLine(2);
+                for (int j = 210; j<1210;++j){
+                  double t = j-210;
+                  double x,y,z,r;
+                  x = parFit[0] + parFit[1]*t;
+                  y = parFit[2] + parFit[3]*t;
+                  r = TMath::Sqrt(x*x+y*y);
+                  z = t;
+                  //myfile<<x<<"\t"<<y<<endl;
+                  dummy->SetPoint(j-210,x,y,z);
+                  dummy2d->SetPoint(j-210,y,z);
+                }
+                dummy->SetLineColor(kRed);
+                dummy2d->SetLineColor(kRed);
+
+                tracksGraph.push_back(dummy);
+              }
+
+            }
 
           }
         }
-        if(inelasticcut->IsInside(anglea,angleb)&&cut1->IsInside(energycm,2.0/7.0*(ena+enb))){
-          is2B=kTRUE;
-          //Vertex1->Fill(enb);
+      }
 
-          Double_t energylab = 7.0/2.0*energycm;
-          Double_t thetalow=0.0;
-          Double_t thetahigh=0.0;
-          if(energylab>=43.0&&energylab<45.0){
-            for(Int_t i=0;i<100;i++){
-              if(enb>=enlist43[i]){
-                thetalow=anglist43[i]+(anglist43[i+1]-anglist43[i])*(enb-enlist43[i])/(enlist43[i+1]-enlist43[i]);
-                break;
-              }
-            }
-            for(Int_t i=0;i<100;i++){
-              if(enb>=enlist45[i]){
-                thetahigh=anglist45[i]+(anglist45[i+1]-anglist45[i])*(enb-enlist45[i])/(enlist45[i+1]-enlist45[i]);
-                break;
-              }
-            }
-            thetacm = thetalow + (thetahigh-thetalow)*(energylab-43.0)/(45.0-43.0);
-          }
-          if(energylab>=40.0&&energylab<43.0){
-            for(Int_t i=0;i<100;i++){
-              if(enb>=enlist40[i]){
-                thetalow=anglist40[i]+(anglist40[i+1]-anglist40[i])*(enb-enlist40[i])/(enlist40[i+1]-enlist40[i]);
-                break;
-              }
-            }
-            for(Int_t i=0;i<100;i++){
-              if(enb>=enlist43[i]){
-                thetahigh=anglist43[i]+(anglist43[i+1]-anglist43[i])*(enb-enlist43[i])/(enlist43[i+1]-enlist43[i]);
-                break;
-              }
-            }
-            thetacm = thetalow + (thetahigh-thetalow)*(energylab-40.0)/(43.0-40.0);
-          }
-          else if(energylab>=38.0&&energylab<40.0){
-            for(Int_t i=0;i<100;i++){
-              if(enb>=enlist38[i]){
-                thetalow=anglist38[i]+(anglist38[i+1]-anglist38[i])*(enb-enlist38[i])/(enlist38[i+1]-enlist38[i]);
-                break;
-              }
-            }
-            for(Int_t i=0;i<100;i++){
-              if(enb>=enlist40[i]){
-                thetahigh=anglist40[i]+(anglist40[i+1]-anglist40[i])*(enb-enlist40[i])/(enlist40[i+1]-enlist40[i]);
-                break;
-              }
-            }
-            thetacm = thetalow + (thetahigh-thetalow)*(energylab-38.0)/(40.0-38.0);
-          }
-          else if(energylab>=35.0&&energylab<38.0){
-            for(Int_t i=0;i<100;i++){
-              if(enb>=enlist35[i]){
-                thetalow=anglist35[i]+(anglist35[i+1]-anglist35[i])*(enb-enlist35[i])/(enlist35[i+1]-enlist35[i]);
-                break;
-              }
-            }
-            for(Int_t i=0;i<100;i++){
-              if(enb>=enlist38[i]){
-                thetahigh=anglist38[i]+(anglist38[i+1]-anglist38[i])*(enb-enlist38[i])/(enlist38[i+1]-enlist38[i]);
-                break;
-              }
-            }
-            thetacm = thetalow + (thetahigh-thetalow)*(energylab-35.0)/(38.0-35.0);
-          }
-          else if(energylab>=33.0&&energylab<35.0){
-            for(Int_t i=0;i<100;i++){
-              if(enb>=enlist33[i]){
-                thetalow=anglist33[i]+(anglist33[i+1]-anglist33[i])*(enb-enlist33[i])/(enlist33[i+1]-enlist33[i]);
-                break;
-              }
-            }
-            for(Int_t i=0;i<100;i++){
-              if(enb>=enlist35[i]){
-                thetahigh=anglist35[i]+(anglist35[i+1]-anglist35[i])*(enb-enlist35[i])/(enlist35[i+1]-enlist35[i]);
-                break;
-              }
-            }
-            thetacm = thetalow + (thetahigh-thetalow)*(energylab-33.0)/(35.0-33.0);
-          }
-          else if(energylab>=30.0&&energylab<33.0){
-            for(Int_t i=0;i<100;i++){
-              if(enb>=enlist30[i]){
-                thetalow=anglist30[i]+(anglist30[i+1]-anglist30[i])*(enb-enlist30[i])/(enlist30[i+1]-enlist30[i]);
-                break;
-              }
-            }
-            for(Int_t i=0;i<100;i++){
-              if(enb>=enlist33[i]){
-                thetahigh=anglist33[i]+(anglist33[i+1]-anglist33[i])*(enb-enlist33[i])/(enlist33[i+1]-enlist33[i]);
-                break;
-              }
-            }
-            thetacm = thetalow + (thetahigh-thetalow)*(energylab-30.0)/(33.0-30.0);
-          }
-          else if(energylab>=28.0&&energylab<30.0){
-            for(Int_t i=0;i<100;i++){
-              if(enb>=enlist28[i]){
-                thetalow=anglist28[i]+(anglist28[i+1]-anglist28[i])*(enb-enlist28[i])/(enlist28[i+1]-enlist28[i]);
-                break;
-              }
-            }
-            for(Int_t i=0;i<100;i++){
-              if(enb>=enlist30[i]){
-                thetahigh=anglist30[i]+(anglist30[i+1]-anglist30[i])*(enb-enlist30[i])/(enlist30[i+1]-enlist30[i]);
-                break;
-              }
-            }
-            thetacm = thetalow + (thetahigh-thetalow)*(energylab-28.0)/(30.0-28.0);
-          }
-          else if(energylab>=25.0&&energylab<28.0){
-            for(Int_t i=0;i<100;i++){
-              if(enb>=enlist25[i]){
-                thetalow=anglist25[i]+(anglist25[i+1]-anglist25[i])*(enb-enlist25[i])/(enlist25[i+1]-enlist25[i]);
-                break;
-              }
-            }
-            for(Int_t i=0;i<100;i++){
-              if(enb>=enlist28[i]){
-                thetahigh=anglist28[i]+(anglist28[i+1]-anglist28[i])*(enb-enlist28[i])/(enlist28[i+1]-enlist28[i]);
-                break;
-              }
-            }
-            thetacm = thetalow + (thetahigh-thetalow)*(energylab-25.0)/(28.0-25.0);
-          }
-          else if(energylab>=23.0&&energylab<25.0){
-            for(Int_t i=0;i<100;i++){
-              if(enb>=enlist23[i]){
-                thetalow=anglist23[i]+(anglist23[i+1]-anglist23[i])*(enb-enlist23[i])/(enlist23[i+1]-enlist23[i]);
-                break;
-              }
-            }
-            for(Int_t i=0;i<100;i++){
-              if(enb>=enlist25[i]){
-                thetahigh=anglist25[i]+(anglist25[i+1]-anglist25[i])*(enb-enlist25[i])/(enlist25[i+1]-enlist25[i]);
-                break;
-              }
-            }
-            thetacm = thetalow + (thetahigh-thetalow)*(energylab-23.0)/(25.0-23.0);
-          }
-          else if(energylab>=20.0&&energylab<23.0){
-            for(Int_t i=0;i<100;i++){
-              if(enb>=enlist20[i]){
-                thetalow=anglist20[i]+(anglist20[i+1]-anglist20[i])*(enb-enlist20[i])/(enlist20[i+1]-enlist20[i]);
-                break;
-              }
-            }
-            for(Int_t i=0;i<100;i++){
-              if(enb>=enlist23[i]){
-                thetahigh=anglist23[i]+(anglist23[i+1]-anglist23[i])*(enb-enlist23[i])/(enlist23[i+1]-enlist23[i]);
-                break;
-              }
-            }
-            thetacm = thetalow + (thetahigh-thetalow)*(energylab-20.0)/(23.0-20.0);
-          }
-          else if(energylab>=18.0&&energylab<20.0){
-            for(Int_t i=0;i<100;i++){
-              if(enb>=enlist18[i]){
-                thetalow=anglist18[i]+(anglist18[i+1]-anglist18[i])*(enb-enlist18[i])/(enlist18[i+1]-enlist18[i]);
-                break;
-              }
-            }
-            for(Int_t i=0;i<100;i++){
-              if(enb>=enlist20[i]){
-                thetahigh=anglist20[i]+(anglist20[i+1]-anglist20[i])*(enb-enlist20[i])/(enlist20[i+1]-enlist20[i]);
-                break;
-              }
-            }
-            thetacm = thetalow + (thetahigh-thetalow)*(energylab-18.0)/(20.0-18.0);
-          }
-          else if(energylab>=15.0&&energylab<18.0){
-            for(Int_t i=0;i<100;i++){
-              if(enb>=enlist15[i]){
-                thetalow=anglist15[i]+(anglist15[i+1]-anglist15[i])*(enb-enlist15[i])/(enlist15[i+1]-enlist15[i]);
-                break;
-              }
-            }
-            for(Int_t i=0;i<100;i++){
-              if(enb>=enlist18[i]){
-                thetahigh=anglist18[i]+(anglist18[i+1]-anglist18[i])*(enb-enlist18[i])/(enlist18[i+1]-enlist18[i]);
-                break;
-              }
-            }
-            thetacm = thetalow + (thetahigh-thetalow)*(energylab-15.0)/(18.0-15.0);
-          }
-          else if(energylab>=0.0&&energylab<15.0){
-            for(Int_t i=0;i<100;i++){
-              if(enb>=enlist15[i]){
-                thetahigh=anglist15[i]+(anglist15[i+1]-anglist15[i])*(enb-enlist15[i])/(enlist15[i+1]-enlist15[i]);
-                break;
-              }
-            }
-            thetacm = thetalow + (thetahigh-thetalow)*(energylab-0.0)/(15.0-0.0);
-          }
-          thetacm=180-thetacm;
-          if(thetacm>0.0){
-            //Excitation_EL->Fill(energycm, 2.0/7.0*(ena+enb));
-            Excitation_IN->Fill(thetacm,energycm);
-            //Q13_Kine->Fill(anglea,thetacm);
-          }
-        }
-        }
     }
+
+
+
+
+
+    numgood.clear();
+    numspark.clear();
+    if(evnt%10000==0)std::cout<<" Event : "<<evnt<<std::endl;
+    evnt++;
   }
-  if(trackVector.size()>2&&!is2B){
-    Int_t i =0;
-    while(i<trackVector.size()){
-      Int_t j=i+1;
-      while(j<trackVector.size()){
-        if(TMath::Abs(trackVector.at(i).GetAngleZAxis()-trackVector.at(j).GetAngleZAxis())<1.0*TMath::DegToRad()){
-          trackVector.erase(trackVector.begin()+j);
-          maxradvec.erase(maxradvec.begin()+j);
-          maxrad.erase(maxrad.begin()+j);
-        }
-        else{
-          j++;
-        }
-      }
-      if(maxrad.at(i)>110.0){
-        trackVector.erase(trackVector.begin()+i);
-        maxradvec.erase(maxradvec.begin()+i);
-        maxrad.erase(maxrad.begin()+i);
-      }
-      else if(maxrad.at(i)<10.0){
-        trackVector.erase(trackVector.begin()+i);
-        maxradvec.erase(maxradvec.begin()+i);
-        maxrad.erase(maxrad.begin()+i);
-      }
-      else{
-        i++;
-      }
-    }
-    if(trackVector.size()==3){
-      Int_t first = randGen.Integer(3);
-      Double_t range0 = (maxradvec[first]-trackVector.at(first).GetTrackVertex()).Mag();
-      Double_t range1 = (maxradvec[(first+1)%3]-trackVector.at((first+1)%3).GetTrackVertex()).Mag();
-      Double_t range2 = (maxradvec[(first+2)%3]-trackVector.at((first+2)%3).GetTrackVertex()).Mag();
-      Double_t sumrange= range0+range1+range2;
-      Double_t fracrange0 = range0/sumrange;
-      Double_t fracrange1 = range1/sumrange;
-      Double_t fracrange2 = range2/sumrange;
-      Double_t dalitzx = TMath::Sqrt(3.0)/2.0*(fracrange1-fracrange0);
-      Double_t dalitzy = 1.0/2.0*(2*fracrange2-fracrange0-fracrange1);
-      //dalitz->Fill(fracrange0,fracrange1,fracrange2);
-
-      Double_t flipx;
-      Double_t flipy;
-      if(sumrange>100&&sumrange<255){
-    dalitz->Fill(trackVector.at(first).GetAngleZAxis()*TMath::RadToDeg(),trackVector.at((first+1)%3).GetAngleZAxis()*TMath::RadToDeg(),trackVector.at((first+2)%3).GetAngleZAxis()*TMath::RadToDeg());
-    if(a->Eval(dalitzx)<dalitzy){
-      flipx = 2*(dalitzx+dalitzy*slope)/(1+slope*slope)-dalitzx;
-      flipy = 2*slope*(dalitzx+dalitzy*slope)/(1+slope*slope)-dalitzy;
-      dalitzx = flipx;
-      dalitzy = flipy;
-    }
-    if(b->Eval(dalitzx)<dalitzy){
-      flipx = 2*(dalitzx - dalitzy*slope)/(1+slope*slope)-dalitzx;
-      flipy = -2*slope*(dalitzx-dalitzy*slope)/(1+slope*slope)-dalitzy;
-      dalitzx = flipx;
-      dalitzy = flipy;
-    }
-    dalitzx = TMath::Abs(dalitzx);
-    dalitz2d->Fill(dalitzx,dalitzy);
-    Vertex1->Fill(sumrange);
-  }
-    }
-  }
-
-}
-
-
-
-
-
-numgood.clear();
-numspark.clear();
-if(evnt%10000==0)std::cout<<" Event : "<<evnt<<std::endl;
-evnt++;
-}
-file->Close();
+  file->Close();
 }
 
 
@@ -1144,19 +1161,20 @@ cut1->Draw("same");
 
 
 c4->cd(1);
- dalitz->Draw("same");
-// trackpic->Draw();
-// for(Int_t i =0;i<tracksGraph.size();i++){
-//   tracksGraph.at(i)->Draw("same");
-// }
+dalitz->Draw("same");
+
 c4->cd(2);
 dalitz2d->Draw("colz");
 a->Draw("same");
 b->Draw("same");
 
-c5->cd(1);
+c5->cd();
 //PhiCompare->Draw("*");
-c5->cd(2);
+trackpic->Draw();
+for(Int_t i =0;i<tracksGraph.size();i++){
+  tracksGraph.at(i)->Draw("same");
+}
+//c5->cd(2);
 //PhiCompare1->Draw();
 
 c6->cd(1);

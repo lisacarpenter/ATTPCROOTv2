@@ -6,7 +6,7 @@ void rundigi_sim()
  TStopwatch timer;
  timer.Start();
  // ------------------------------------------------------------------------
- TString mcFile = "~/fair_install/ATTPCROOTv2/digi/attpcsim_3.root";
+ TString mcFile = "~/fair_install/ATTPCROOTv2/digi/attpcsim_2.root";
  TString scriptfile = "LookupProto10Be.xml";
  TString protomapfile = "proto.map";
  TString dir = getenv("VMCWORKDIR");
@@ -62,7 +62,7 @@ void rundigi_sim()
 
   // __ Init and run ___________________________________
   fRun -> Init();
-  fRun -> Run(0,50000);
+  fRun -> Run(0,1000000);
   //fRun -> RunOnTBData();
 
   std::cout << std::endl << std::endl;

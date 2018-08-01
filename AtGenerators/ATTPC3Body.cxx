@@ -152,12 +152,10 @@ ATTPC3Body::~ATTPC3Body()
  // if (fIon) delete fIon;
 }
 
-void kinematics(int step = 1){
-
-}
 
 // -----   Public method ReadEvent   --------------------------------------
 Bool_t ATTPC3Body::ReadEvent(FairPrimaryGenerator* primGen) {
+    FairMCEventHeader* MCEventHeader = primGen->GetEvent();
     std::vector<Double_t> Ang;				     // Lab Angle of the products
     std::vector<Double_t> Ene;                                // Lab Energy of the products
     Ang.reserve(2);
@@ -214,6 +212,7 @@ Bool_t ATTPC3Body::ReadEvent(FairPrimaryGenerator* primGen) {
     std::cout << "-I- ATTPC3Body : No solution!"<<std::endl;
     fNoSolution=kTRUE;
     gATVP->SetValidKine(kFALSE);
+    MCEventHeader->MarkSet(kFALSE);
    // return kFALSE;
 
   }
@@ -404,15 +403,18 @@ Bool_t ATTPC3Body::ReadEvent(FairPrimaryGenerator* primGen) {
         Bool_t doesDecay = kFALSE;
         //secondary decay
 
-        TLorentzVector scatterV(fPx.at(2),fPy.at(2),fPz.at(2),fWm[2]+(gATVP->GetScatterE())/1000.0);
-        double outmass[2] = {fWm[4],fWm[5]};
+        TLorentzVector scatterV(0.0,0.0,0.0,fWm[2]/1000.0+(gATVP->GetScatterE())/1000.0);
+        double outmass[2] = {fWm[4]/1000.0,fWm[5]/1000.0};
         TGenPhaseSpace decay;
-        decay.SetDecay(scatterV,2,outmass);
+        Bool_t allowed;
+        allowed = decay.SetDecay(scatterV,2,outmass);
+        std::cout<<allowed<<std::endl;
         decay.Generate();
         TLorentzVector *out1 = decay.GetDecay(0);
         TLorentzVector *out2 = decay.GetDecay(1);
-        if(out1->P()>0&&out2->P()>0){
-          doesDecay = kTRUE;
+        if(allowed&&gATVP->GetValidKine()){
+          std::cout<<"====Success==="<<std::endl;
+          MCEventHeader->MarkSet(kTRUE);
           fPx.at(4) = out1->Px();
           fPy.at(4) = out1->Py();
           fPz.at(4) = out1->Pz();
@@ -431,6 +433,9 @@ Bool_t ATTPC3Body::ReadEvent(FairPrimaryGenerator* primGen) {
           std::cout << " 2nd Recoiled angle:"  << gATVP->GetBURes2A() << " deg" << std::endl;
         }
         else{
+          fNoSolution=kTRUE;
+          gATVP->SetValidKine(kFALSE);
+          MCEventHeader->MarkSet(kFALSE);
           std::cout<< "=====No three-body decay====="<<std::endl;
           fPx.at(4) = 0.0;
           fPy.at(4) = 0.0;

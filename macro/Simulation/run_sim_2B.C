@@ -143,7 +143,7 @@ void run_sim_2B(Int_t nEvents = 10000, TString mcEngine = "TGeant4")
 		  Pyp.push_back(0.0);
 		  Pzp.push_back(0.0);
 		  Mass.push_back(9.3255);
-		  ExE.push_back(3.36803);
+		  ExE.push_back(0.0);
 
 
                   // ---- Recoil -----

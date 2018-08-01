@@ -370,8 +370,8 @@ Bool_t  AtTpc::ProcessHits(FairVolume* vol)
        fTime,
        fLength,
        fELoss,
-       gATVP->GetBURes2E(),
-       gATVP->GetBURes2A(),
+       gATVP->GetBURes1E(),
+       gATVP->GetBURes1A(),
        AZ.first,
        AZ.second);
 
@@ -391,8 +391,8 @@ Bool_t  AtTpc::ProcessHits(FairVolume* vol)
        fTime,
        fLength,
        fELoss,
-       0,
-       0,
+       gATVP->GetBURes2E(),
+       gATVP->GetBURes2A(),
        AZ.first,
        AZ.second);
   }

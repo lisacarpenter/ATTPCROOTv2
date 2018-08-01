@@ -93,7 +93,7 @@ void run_unpack_sim_10Be(TString dataFile = "10Be_2013_run_0021.txt",TString par
 */
    run->Init();
 
-  run->Run(0,50000);
+  run->Run(0,70000);
 	//run -> RunOnTBData();
 
  // -----   Finish   -------------------------------------------------------

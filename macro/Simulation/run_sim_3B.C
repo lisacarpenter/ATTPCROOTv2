@@ -1,4 +1,4 @@
-void run_sim_3B(Int_t nEvents = 50000, TString mcEngine = "TGeant4")
+void run_sim_3B(Int_t nEvents = 10000, TString mcEngine = "TGeant4")
 
 {
 
@@ -79,8 +79,8 @@ void run_sim_3B(Int_t nEvents = 50000, TString mcEngine = "TGeant4")
 	        Double_t pz = 0.895/a;  // Z-Momentum / per nucleon!!!!!!
 
   	        Double_t BExcEner = 0.0;
-                Double_t Bmass = 9.3255; //Mass in GeV
-                Double_t NomEnergy = 40.0; //Nominal Energy of the beam: Only used for cross section calculation (Tracking energy is determined with momentum). TODO: Change this to the energy after the IC
+                Double_t Bmass =  9.325577; //Mass in GeV
+                Double_t NomEnergy = 28.0; //Nominal Energy of the beam: Only used for cross section calculation (Tracking energy is determined with momentum). TODO: Change this to the energy after the IC
                 Double_t TargetMass = 3.7284;//Mass in GeV
 
 
@@ -132,28 +132,28 @@ void run_sim_3B(Int_t nEvents = 50000, TString mcEngine = "TGeant4")
             		  Pxp.push_back(0.0);
                   Pyp.push_back(0.0);
             		  Pzp.push_back(0.0);
-                  Mass.push_back(3.7284);
+                  Mass.push_back(3.727408);
             		  ExE.push_back(0.0);//In MeV
 
                   //--- Scattered -----
                   Zp.push_back(4); // 40Ar TRACKID=1
-	 	  Ap.push_back(8); //
+	 	  Ap.push_back(10); //
 		  Qp.push_back(4);
 		  Pxp.push_back(0.0);
 		  Pyp.push_back(0.0);
 		  Pzp.push_back(0.0);
-		  Mass.push_back(7.4519);
+		  Mass.push_back(9.325577);
 		  ExE.push_back(0.0);
 
 
                   // ---- Recoil -----
      Zp.push_back(2); // p  TRACKID=2
-    Ap.push_back(6); //
+    Ap.push_back(4); //
     Qp.push_back(2); //
     Pxp.push_back(0.0);
                  Pyp.push_back(0.0);
     Pzp.push_back(0.0);
-                 Mass.push_back(5.60656);
+                 Mass.push_back(3.727408);
     ExE.push_back(0.0);//In MeV
 
       //first particle in decay
@@ -163,17 +163,17 @@ void run_sim_3B(Int_t nEvents = 50000, TString mcEngine = "TGeant4")
      Pxp.push_back(0.0);
                   Pyp.push_back(0.0);
      Pzp.push_back(0.0);
-                  Mass.push_back(3.7284);
+                  Mass.push_back(3.727408);
      ExE.push_back(0.0);//In MeV
 
      //second particle to decay
       Zp.push_back(2); // p  TRACKID=2
-     Ap.push_back(4); //
+     Ap.push_back(6); //
      Qp.push_back(2); //
      Pxp.push_back(0.0);
                   Pyp.push_back(0.0);
      Pzp.push_back(0.0);
-                  Mass.push_back(3.7284);
+                  Mass.push_back(5.605579);
      ExE.push_back(0.0);//In MeV
 
                   Double_t ThetaMinCMS = 0.1;
