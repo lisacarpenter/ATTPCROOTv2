@@ -147,6 +147,7 @@ ATClusterizeTask::Exec(Option_t* option)
                Int_t size = fElectronNumberArray -> GetEntriesFast();
                ATSimulatedPoint* simpoint
                  = new((*fElectronNumberArray)[size]) ATSimulatedPoint(electronNumber,  //electron #
+                                                                      trackID,
                                                                       genElectrons,
                                                                       propX,  //X
                                                                       propY,  //Y

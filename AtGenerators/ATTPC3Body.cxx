@@ -152,6 +152,9 @@ ATTPC3Body::~ATTPC3Body()
  // if (fIon) delete fIon;
 }
 
+void kinematics(int step = 1){
+
+}
 
 // -----   Public method ReadEvent   --------------------------------------
 Bool_t ATTPC3Body::ReadEvent(FairPrimaryGenerator* primGen) {
@@ -403,13 +406,14 @@ Bool_t ATTPC3Body::ReadEvent(FairPrimaryGenerator* primGen) {
         Bool_t doesDecay = kFALSE;
         //secondary decay
 
-        TLorentzVector scatterV(0.0,0.0,0.0,fWm[2]/1000.0+(gATVP->GetScatterE())/1000.0);
+        TLorentzVector scatterV(fPx.at(2),fPy.at(2),fPz.at(2),fWm[2]/1000.0+(gATVP->GetScatterE())/1000.0);
         double outmass[2] = {fWm[4]/1000.0,fWm[5]/1000.0};
         TGenPhaseSpace decay;
         Bool_t allowed;
         allowed = decay.SetDecay(scatterV,2,outmass);
         std::cout<<allowed<<std::endl;
-        decay.Generate();
+        Double_t wt=decay.Generate();
+        std::cout<<"weight: "<<wt<<std::endl;
         TLorentzVector *out1 = decay.GetDecay(0);
         TLorentzVector *out2 = decay.GetDecay(1);
         if(allowed&&gATVP->GetValidKine()){
@@ -423,9 +427,9 @@ Bool_t ATTPC3Body::ReadEvent(FairPrimaryGenerator* primGen) {
           fPz.at(5) = out2->Pz();
 
           gATVP->SetBURes1A(out1->Theta()*TMath::RadToDeg());
-          gATVP->SetBURes1E(out1->E()*1000.0);
+          gATVP->SetBURes1E(out1->E());
           gATVP->SetBURes2A(out2->Theta()*TMath::RadToDeg());
-          gATVP->SetBURes2E(out2->E()*1000.0);
+          gATVP->SetBURes2E(out2->E());
 
           std::cout << " 2nd Scattered energy:" << gATVP->GetBURes1E()  << " MeV" << std::endl;
           std::cout << " 2nd Scattered  angle:"  << gATVP->GetBURes1A() << " deg" << std::endl;
@@ -491,7 +495,7 @@ Bool_t ATTPC3Body::ReadEvent(FairPrimaryGenerator* primGen) {
 
 
 
-		      if(i>1 && gATVP->GetDecayEvtCnt() && pdgType!=1000500500 && fPType.at(i)=="Ion" ){// TODO: Dirty way to propagate only the products (0 and 1 are beam and target respectively)
+		      if(i>2 && gATVP->GetDecayEvtCnt() && pdgType!=1000500500 && fPType.at(i)=="Ion" ){// TODO: Dirty way to propagate only the products (0 and 1 are beam and target respectively)
 
 
 			 std::cout << "-I- FairIonGenerator: Generating ions of type "

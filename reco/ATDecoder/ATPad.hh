@@ -33,7 +33,7 @@ class ATPad : public TObject  {
     void SetPadXCoord(Double_t val);
     void SetPadYCoord(Double_t val);
     void SetIsAux(Bool_t val);
-
+    void SetTrackID(Int_t trackID);
     ATPad &operator= (ATPad right);
 
     Bool_t IsPedestalSubtracted();
@@ -52,7 +52,7 @@ class ATPad : public TObject  {
 
     Float_t GetPadXCoord();
     Float_t GetPadYCoord();
-
+    Int_t   GetTrackID();
    private:
 
     Int_t fPadNum;
@@ -66,6 +66,7 @@ class ATPad : public TObject  {
     //Bool_t fIsGainCalibrated;
     Double_t fAdc[512];
     Bool_t kIsAux;
+    Int_t fTrackID;
 
     ClassDef(ATPad, 1);
 

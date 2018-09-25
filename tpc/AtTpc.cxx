@@ -311,7 +311,7 @@ Bool_t  AtTpc::ProcessHits(FairVolume* vol)
            AZ.second);
 
 	}
-	else if(gATVP->GetDecayEvtCnt()%2==0 && fTrackID==1)
+	else if(gATVP->GetDecayEvtCnt()%2==0 && fTrackID==12)
 	{
 
  		AddHit(fTrackID,
@@ -334,7 +334,7 @@ Bool_t  AtTpc::ProcessHits(FairVolume* vol)
 
 
 	}
-        else if(gATVP->GetDecayEvtCnt()%2==0 && fTrackID==2)
+        else if(gATVP->GetDecayEvtCnt()%2==0 && fTrackID==1)
 	{
 
  		AddHit(fTrackID,
@@ -356,7 +356,7 @@ Bool_t  AtTpc::ProcessHits(FairVolume* vol)
 
 
 	}
-  else if(gATVP->GetDecayEvtCnt()%2==0 && fTrackID==3)
+  else if(gATVP->GetDecayEvtCnt()%2==0 && fTrackID==2)
   {
 
         AddHit(fTrackID,
@@ -378,7 +378,7 @@ Bool_t  AtTpc::ProcessHits(FairVolume* vol)
 
 
   }
-  else if(gATVP->GetDecayEvtCnt()%2==0 && fTrackID==4)
+  else if(gATVP->GetDecayEvtCnt()%2==0 && fTrackID==3)
   {
         AddHit(fTrackID,
        fVolumeID,

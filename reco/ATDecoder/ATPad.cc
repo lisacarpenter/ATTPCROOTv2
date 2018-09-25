@@ -56,12 +56,14 @@ void ATPad::SetADC(Int_t idx, Double_t val)       { fAdc[idx] = val; }
 void ATPad::SetPadXCoord(Double_t val)            { fPadXCoord = val;}
 void ATPad::SetPadYCoord(Double_t val)            { fPadYCoord = val;}
 void ATPad::SetIsAux(Bool_t val)                  { kIsAux = val;}
+void ATPad::SetTrackID(Int_t trackID)               { fTrackID=trackID;}
 
 Float_t ATPad::GetPadXCoord()                     { return fPadXCoord;}
 Float_t ATPad::GetPadYCoord()                     { return fPadYCoord;}
 
 Bool_t ATPad::GetValidPad()                       { return kIsValid;}
 Bool_t ATPad::IsAux()                             { return kIsAux;}
+Int_t  ATPad::GetTrackID()                        { return fTrackID; }
 
 ATPad &ATPad::operator= (ATPad right)
 {

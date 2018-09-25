@@ -120,7 +120,7 @@ void run_sim_proto(Int_t nEvents = 100, TString mcEngine = "TGeant4")
 		  Pxp.push_back(0.0);
 	          Pyp.push_back(0.0);
 		  Pzp.push_back(0.0);
-      ExE.push_back(0.0);
+      ExE.push_back(1.797);
                   Mass.push_back(5606.56); //In MeV
 
 		  // ---- Particle 2 -----

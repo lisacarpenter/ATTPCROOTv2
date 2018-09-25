@@ -94,6 +94,7 @@ fDriftedElectronArray = (TClonesArray *) ioman -> GetObject("ATSimulatedPoint");
 struct vPad{
   Double_t RawADC[512];
   Int_t padnumb;
+  Int_t trackID;
 };
 
 void
@@ -132,6 +133,7 @@ ATPulseTask::Exec(Option_t* option)
    Double_t pBin, g, xElectron, yElectron, eTime, clusterNum, eventID;
    Int_t padNumber;
    TVector3 coord;
+   Int_t pointnum;
    ATSimulatedPoint* dElectron;
    std::vector<Float_t> PadCenterCoord;
    TF1 *gain                        =  new TF1("gain", "4*(x/[0])*exp(-2*(x/[0]))", 0.1, 5000);//Polya distribution of gain
@@ -149,6 +151,7 @@ ATPulseTask::Exec(Option_t* option)
          dElectron                     = (ATSimulatedPoint*) fDriftedElectronArray -> At(iEvents);
          coord                         = dElectron->GetPosition();
          amplitude                     = dElectron->GetAmplitude();
+         pointnum                      = dElectron->GetTrackID();
          xElectron                     = coord (0); //mm
          yElectron                     = coord (1); //mm
          eTime                         = coord (2); //us
@@ -211,6 +214,7 @@ ATPulseTask::Exec(Option_t* option)
          vsize  = padarray.size();
          for(Int_t y = 0; y<vsize; y++){
            if(padarray[y].padnumb == padNumber){
+             padarray[y].trackID=pointnum;
              for(Int_t del = 0; del<512; del++){//go through every time bucket
                if(digital[del] != 0)  padarray[y].RawADC[del] += digital[del];
              }
@@ -233,6 +237,7 @@ ATPulseTask::Exec(Option_t* option)
            pad->SetPadXCoord(PadCenterCoord[0]);
            pad->SetPadYCoord(PadCenterCoord[1]);
            pad->SetPedestalSubtracted(kTRUE);
+           pad->SetTrackID(padarray[q].trackID);
            for(Int_t p = 0; p<512; p++){
              pad->SetADC(p, padarray[q].RawADC[p]*g);
            }

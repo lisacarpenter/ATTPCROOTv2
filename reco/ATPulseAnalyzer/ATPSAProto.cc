@@ -53,6 +53,7 @@ ATPSAProto::Analyze(ATRawEvent *rawEvent, ATEvent *event)
     Double_t zPos     = 0;
     Double_t zPosCorr = 0.0;
     Double_t charge   = 0;
+    Int_t trackID     = pad -> GetTrackID();
 
     if (!(pad -> IsPedestalSubtracted())) {
       fLogger -> Error(MESSAGE_ORIGIN, "Pedestal should be subtracted to use this class!");
@@ -154,6 +155,7 @@ ATPSAProto::Analyze(ATRawEvent *rawEvent, ATEvent *event)
       hit->SetTimeStamp(maxAdcIdx);
       hit->SetTimeStampCorr(TBCorr);
       hit->SetPositionCorr(xPos, yPos, zPosCorr); //Only Z is corrected here
+      hit->SetTrackID(trackID);
       HitPos =  hit->GetPosition();
       Rho2+= HitPos.Mag2();
       RhoMean+=HitPos.Mag();

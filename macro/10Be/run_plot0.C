@@ -183,6 +183,9 @@ void run_plot0(Int_t runnum=21,Int_t viewEvent = -1)
   TF1 *b = new TF1("b","[0]*x",-1,1);
   a->SetParameter(0,slope);
   b->SetParameter(0,-1*slope);
+  TLine *l = new TLine(0,-1,0,1);
+  l->SetLineColor(kRed);
+  l->SetLineWidth(2);
 
   TH2D* Excitation_EL = new TH2D("Elastic", "Elastic",60,0,180,75,0,15);
   TH2D* Excitation_IN = new TH2D("Inelastic", "Inelastic",60,0,180,75,0,15);
@@ -647,25 +650,25 @@ void run_plot0(Int_t runnum=21,Int_t viewEvent = -1)
       }
     }
 
-    if(evnt==viewEvent){
-      //view points and 3-d lines for the specified event
-      for(Int_t i=0; i<NumHits; i++){
-        ATHit *Hit = event->GetHit(i);
-        TVector3 coords= Hit->GetPosition();
-        //trackpic->Fill(coords.y(),coords.z());
-        trackpic->Fill(coords.x(),coords.y(),coords.z());
-        //cout<<coords.x()<<"\t"<<coords.y()<<"\t"<<coords.z()<<endl;
-      }
-
-      //uncomment break statement below if the only point is viewing
-      //break;
-    }
+    // if(evnt==viewEvent){
+    //   //view points and 3-d lines for the specified event
+    //   for(Int_t i=0; i<NumHits; i++){
+    //     ATHit *Hit = event->GetHit(i);
+    //     TVector3 coords= Hit->GetPosition();
+    //     //trackpic->Fill(coords.y(),coords.z());
+    //     trackpic->Fill(coords.x(),coords.y(),coords.z());
+    //     //cout<<coords.x()<<"\t"<<coords.y()<<"\t"<<coords.z()<<endl;
+    //   }
+    //
+    //   //uncomment break statement below if the only point is viewing
+    //   //break;
+    // }
     is2B=kFALSE;
     std::vector<Double_t> *Phi0Array;
     std::vector<Double_t> *Phi0RArray;
     std::vector<Double_t> *Phi2Array;
     std::vector<Double_t> *Phi2RArray;
-    if(trackVector.size()>1&&deltaE>370&&deltaE<400){
+    if(trackVector.size()>1){//})&&deltaE>370&&deltaE<400){
       for(Int_t i=0;i<trackVector.size();i++){
         for(Int_t j=i+1;j<trackVector.size();j++){
           vertexi = trackVector.at(i).GetTrackVertex();
@@ -777,7 +780,7 @@ void run_plot0(Int_t runnum=21,Int_t viewEvent = -1)
             }
             if(index>-500&&index<0){
               index=500+index;
-              energycm=2.0/7.0*(40.0+(EnergyMM[index]+(EnergyMM[index]-EnergyMM[index+1])*over));
+              energycm=2.0/7.0*(38.0+(EnergyMM[index]+(EnergyMM[index]-EnergyMM[index+1])*over));
               //myfile<<intVertex[0]<<"\t"<<energycm1<<index<<endl;
             }
             Q02_Kine->Fill(x,y);
@@ -1012,110 +1015,134 @@ void run_plot0(Int_t runnum=21,Int_t viewEvent = -1)
           }
         }
       }
-      if(trackVector.size()>2&&!is2B){
+      Bool_t weirdreco =kFALSE;
+      if(trackVector.size()>2){
         Int_t i =0;
         while(i<trackVector.size()){
           Int_t j=i+1;
           while(j<trackVector.size()){
-            if(TMath::Abs(trackVector.at(i).GetAngleZAxis()-trackVector.at(j).GetAngleZAxis())<1.0*TMath::DegToRad()){
+            if(TMath::Abs(trackVector.at(i).GetAngleZAxis()-trackVector.at(j).GetAngleZAxis())<0.5*TMath::DegToRad()){
               trackVector.erase(trackVector.begin()+j);
               maxradvec.erase(maxradvec.begin()+j);
               maxrad.erase(maxrad.begin()+j);
+              weirdreco=kTRUE;
             }
             else{
               j++;
             }
           }
-          if(maxrad.at(i)>110.0){
-            trackVector.erase(trackVector.begin()+i);
-            maxradvec.erase(maxradvec.begin()+i);
-            maxrad.erase(maxrad.begin()+i);
-          }
-          else if(maxrad.at(i)<10.0){
-            trackVector.erase(trackVector.begin()+i);
-            maxradvec.erase(maxradvec.begin()+i);
-            maxrad.erase(maxrad.begin()+i);
-          }
-          else{
-            i++;
-          }
+          i++;
         }
-        if(trackVector.size()==3){
+          // if(maxrad.at(i)>110.0){
+          //   trackVector.erase(trackVector.begin()+i);
+          //   maxradvec.erase(maxradvec.begin()+i);
+          //   maxrad.erase(maxrad.begin()+i);
+          //}
+          // if(maxrad.at(i)<10.0){
+          //   trackVector.erase(trackVector.begin()+i);
+          //   maxradvec.erase(maxradvec.begin()+i);
+          //   maxrad.erase(maxrad.begin()+i);
+          // }
+          // else{
+          //   i++;
+          // }
+          }
+        if(trackVector.size()==3&&maxrad[0]<120.&&maxrad[1]<120.&&maxrad[2]<120.){
           Int_t first = randGen.Integer(3);
           Double_t range0 = (maxradvec[first]-trackVector.at(first).GetTrackVertex()).Mag();
           Double_t range1 = (maxradvec[(first+1)%3]-trackVector.at((first+1)%3).GetTrackVertex()).Mag();
           Double_t range2 = (maxradvec[(first+2)%3]-trackVector.at((first+2)%3).GetTrackVertex()).Mag();
+          // range0 = TMath::Sqrt(range0);
+          // range1 = TMath::Sqrt(range1);
+          // range2 = TMath::Sqrt(range2);
           Double_t sumrange= range0+range1+range2;
           Double_t fracrange0 = range0/sumrange;
           Double_t fracrange1 = range1/sumrange;
           Double_t fracrange2 = range2/sumrange;
           Double_t dalitzx = TMath::Sqrt(3.0)/2.0*(fracrange1-fracrange0);
-          Double_t dalitzy = 1.0/2.0*(2*fracrange2-fracrange0-fracrange1);
+  				Double_t dalitzy = 1.0/2.0*(2*fracrange2-fracrange0-fracrange1);
+  				Double_t dalitzx1 = TMath::Sqrt(3.0)/2.0*(fracrange2-fracrange1);
+  				Double_t dalitzy1 = 1.0/2.0*(2*fracrange0-fracrange1-fracrange2);
+  				Double_t dalitzx2 = TMath::Sqrt(3.0)/2.0*(fracrange0-fracrange2);
+  				Double_t dalitzy2 = 1.0/2.0*(2*fracrange1-fracrange2-fracrange0);
+  				Double_t dalitzx0 = TMath::Sqrt(3.0)/2.0*(fracrange0-fracrange1);
+  				Double_t dalitzy0 = 1.0/2.0*(2*fracrange2-fracrange1-fracrange0);
+  				Double_t dalitzx01 = TMath::Sqrt(3.0)/2.0*(fracrange1-fracrange2);
+  				Double_t dalitzy01 = 1.0/2.0*(2*fracrange0-fracrange2-fracrange1);
+  				Double_t dalitzx02 = TMath::Sqrt(3.0)/2.0*(fracrange2-fracrange0);
+  				Double_t dalitzy02 = 1.0/2.0*(2*fracrange1-fracrange0-fracrange2);
           //dalitz->Fill(fracrange0,fracrange1,fracrange2);
+
 
           Double_t flipx;
           Double_t flipy;
+          //cout<<sumrange<<endl;
           if(sumrange>100&&sumrange<255){
             dalitz->Fill(trackVector.at(first).GetAngleZAxis()*TMath::RadToDeg(),trackVector.at((first+1)%3).GetAngleZAxis()*TMath::RadToDeg(),trackVector.at((first+2)%3).GetAngleZAxis()*TMath::RadToDeg());
-            if(a->Eval(dalitzx)<dalitzy){
-              flipx = 2*(dalitzx+dalitzy*slope)/(1+slope*slope)-dalitzx;
-              flipy = 2*slope*(dalitzx+dalitzy*slope)/(1+slope*slope)-dalitzy;
-              dalitzx = flipx;
-              dalitzy = flipy;
-            }
-            if(b->Eval(dalitzx)<dalitzy){
-              flipx = 2*(dalitzx - dalitzy*slope)/(1+slope*slope)-dalitzx;
-              flipy = -2*slope*(dalitzx-dalitzy*slope)/(1+slope*slope)-dalitzy;
-              dalitzx = flipx;
-              dalitzy = flipy;
-            }
-            dalitzx = TMath::Abs(dalitzx);
+            // if(a->Eval(dalitzx)<dalitzy){
+            //   flipx = 2*(dalitzx+dalitzy*slope)/(1+slope*slope)-dalitzx;
+            //   flipy = 2*slope*(dalitzx+dalitzy*slope)/(1+slope*slope)-dalitzy;
+            //   dalitzx = flipx;
+            //   dalitzy = flipy;
+            // }
+            // if(b->Eval(dalitzx)<dalitzy){
+            //   flipx = 2*(dalitzx - dalitzy*slope)/(1+slope*slope)-dalitzx;
+            //   flipy = -2*slope*(dalitzx-dalitzy*slope)/(1+slope*slope)-dalitzy;
+            //   dalitzx = flipx;
+            //   dalitzy = flipy;
+            // }
+            // dalitzx = TMath::Abs(dalitzx);
             dalitz2d->Fill(dalitzx,dalitzy);
-            Vertex1->Fill(sumrange);
-            if(TMath::Abs(dalitzx-TMath::Abs(dalitzy))<0.1){
-              cout<<evnt<<endl;
-            }
-            if(evnt==viewEvent){
-              for(Int_t i=0;i<trackVector.size();i++){
-                std::vector<Double_t> parFit = trackVector.at(i).GetFitPar();
-                std::vector<ATHit>* trackhits = trackVector.at(i).GetHitArray();
-                TVector3 vertexcoords = trackVector.at(i).GetTrackVertex();
-                //cout<<"angle "<<trackVector.at(i).GetAngleZAxis()*TMath::RadToDeg()<<endl;
-                Double_t vertexrad = TMath::Sqrt(vertexcoords.x()*vertexcoords.x()+vertexcoords.y()*vertexcoords.y());
-                //cout<<vertexrad<<"\t"<<vertexcoords.z()<<endl;
-                //cout<<"quadrant "<<trackquads.at(i)<<endl;
-                //cout<<"number of hits \t"<<trackhits->size()<<endl;
-                // for(Int_t j=0; j<trackhits->size(); j++){
-                // TVector3 coords=trackhits->at(j).GetPosition();
-                // trackpic->Fill(coords.x(),coords.y(),coords.z());
-                // cout<<coords.x()<<"\t"<<coords.y()<<"\t"<<coords.z()<<endl;
-                // }
-                cout<<RedChi2.at(i)<<"\t"<<trackhits->size()<<endl;
-                cout<<trackVector.at(i).GetAngleZAxis()*TMath::RadToDeg()<<endl;
-                TPolyLine3D *dummy = new TPolyLine3D(2);
-                TPolyLine *dummy2d = new TPolyLine(2);
-                for (int j = 210; j<1210;++j){
-                  double t = j-210;
-                  double x,y,z,r;
-                  x = parFit[0] + parFit[1]*t;
-                  y = parFit[2] + parFit[3]*t;
-                  r = TMath::Sqrt(x*x+y*y);
-                  z = t;
-                  //myfile<<x<<"\t"<<y<<endl;
-                  dummy->SetPoint(j-210,x,y,z);
-                  dummy2d->SetPoint(j-210,y,z);
-                }
-                dummy->SetLineColor(kRed);
-                dummy2d->SetLineColor(kRed);
-
-                tracksGraph.push_back(dummy);
-              }
-
-            }
+            dalitz2d->Fill(dalitzx1,dalitzy1);
+            dalitz2d->Fill(dalitzx2,dalitzy2);
+            dalitz2d->Fill(dalitzx0,dalitzy0);
+            dalitz2d->Fill(dalitzx01,dalitzy01);
+            dalitz2d->Fill(dalitzx02,dalitzy02);
+            Vertex1->Fill(trackVector.at(1).GetTrackVertex().Z());
+            // if(TMath::Abs(dalitzx-TMath::Abs(dalitzy))<0.1){
+            //   cout<<evnt<<endl;
+            // }
+            // if(evnt==viewEvent){
+            //   for(Int_t i=0;i<trackVector.size();i++){
+            //     std::vector<Double_t> parFit = trackVector.at(i).GetFitPar();
+            //     std::vector<ATHit>* trackhits = trackVector.at(i).GetHitArray();
+            //     TVector3 vertexcoords = trackVector.at(i).GetTrackVertex();
+            //     //cout<<"angle "<<trackVector.at(i).GetAngleZAxis()*TMath::RadToDeg()<<endl;
+            //     Double_t vertexrad = TMath::Sqrt(vertexcoords.x()*vertexcoords.x()+vertexcoords.y()*vertexcoords.y());
+            //     //cout<<vertexrad<<"\t"<<vertexcoords.z()<<endl;
+            //     //cout<<"quadrant "<<trackquads.at(i)<<endl;
+            //     //cout<<"number of hits \t"<<trackhits->size()<<endl;
+            //     // for(Int_t j=0; j<trackhits->size(); j++){
+            //     // TVector3 coords=trackhits->at(j).GetPosition();
+            //     // trackpic->Fill(coords.x(),coords.y(),coords.z());
+            //     // cout<<coords.x()<<"\t"<<coords.y()<<"\t"<<coords.z()<<endl;
+            //     // }
+            //     cout<<RedChi2.at(i)<<"\t"<<trackhits->size()<<endl;
+            //     cout<<trackVector.at(i).GetAngleZAxis()*TMath::RadToDeg()<<endl;
+            //     TPolyLine3D *dummy = new TPolyLine3D(2);
+            //     TPolyLine *dummy2d = new TPolyLine(2);
+            //     for (int j = 210; j<1210;++j){
+            //       double t = j-210;
+            //       double x,y,z,r;
+            //       x = parFit[0] + parFit[1]*t;
+            //       y = parFit[2] + parFit[3]*t;
+            //       r = TMath::Sqrt(x*x+y*y);
+            //       z = t;
+            //       //myfile<<x<<"\t"<<y<<endl;
+            //       dummy->SetPoint(j-210,x,y,z);
+            //       dummy2d->SetPoint(j-210,y,z);
+            //     }
+            //     dummy->SetLineColor(kRed);
+            //     dummy2d->SetLineColor(kRed);
+            //
+            //     tracksGraph.push_back(dummy);
+            //   }
+            //
+            // }
 
           }
         }
-      }
+
 
     }
 
@@ -1167,13 +1194,14 @@ c4->cd(2);
 dalitz2d->Draw("colz");
 a->Draw("same");
 b->Draw("same");
+l->Draw("same");
 
 c5->cd();
 //PhiCompare->Draw("*");
-trackpic->Draw();
-for(Int_t i =0;i<tracksGraph.size();i++){
-  tracksGraph.at(i)->Draw("same");
-}
+// trackpic->Draw();
+// for(Int_t i =0;i<tracksGraph.size();i++){
+//   tracksGraph.at(i)->Draw("same");
+// }
 //c5->cd(2);
 //PhiCompare1->Draw();
 

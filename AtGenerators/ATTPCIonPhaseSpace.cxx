@@ -230,6 +230,7 @@ Bool_t ATTPCIonPhaseSpace::ReadEvent(FairPrimaryGenerator* primGen) {
 
    //fImpulsionLab_beam = TVector3(fABeam*fPxBeam,fABeam*fPyBeam,fABeam*fPzBeam);
    fImpulsionLab_beam = TVector3(fPxBeam,fPyBeam,fPzBeam);
+   fImpulsionLab_beam = 0.1*fImpulsionLab_beam;
   // fEnergyImpulsionLab_beam = TLorentzVector(fImpulsionLab_beam,9327.55/1000.0+fBeamEnergy);
     fEnergyImpulsionLab_beam = TLorentzVector(fImpulsionLab_beam,fBeamMass+fBeamEnergy);
 
@@ -267,10 +268,10 @@ Bool_t ATTPCIonPhaseSpace::ReadEvent(FairPrimaryGenerator* primGen) {
 
                fIsDecay=kTRUE;
                Bool_t allowed;
-               allowed = event1.SetDecay(fEnergyImpulsionLab_Total,fMult, mass_1);
+               allowed = event1.SetDecay(fEnergyImpulsionLab_Total,fMult, mass_1,"Fermi");
                std::cout<<"does work?\t"<<allowed<<std::endl;
                Double_t weight1 = event1.Generate();
-
+               std::cout<<"weight: "<<weight1<<std::endl;
               /* p1  = event1.GetDecay(0);
                p2  = event1.GetDecay(1);
 	       p3  = event1.GetDecay(2);*/
@@ -293,7 +294,12 @@ Bool_t ATTPCIonPhaseSpace::ReadEvent(FairPrimaryGenerator* primGen) {
 
               }
 
-
+              gATVP->SetRecoilE(KineticEnergy.at(0));
+              gATVP->SetRecoilA(ThetaLab.at(0));
+              gATVP->SetBURes1E(KineticEnergy.at(1));
+              gATVP->SetBURes1A(ThetaLab.at(1));
+              gATVP->SetBURes2E(KineticEnergy.at(2));
+              gATVP->SetBURes2A(ThetaLab.at(2));
 
 
 
