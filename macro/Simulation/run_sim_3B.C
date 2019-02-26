@@ -76,7 +76,7 @@ void run_sim_3B(Int_t nEvents = 10000, TString mcEngine = "TGeant4")
 	        Int_t m = 1;   // Multiplicity  NOTE: Due the limitation of the TGenPhaseSpace accepting only pointers/arrays the maximum multiplicity has been set to 10 particles.
 	        Double_t px = 0.000/a;  // X-Momentum / per nucleon!!!!!!
 	        Double_t py = 0.000/a;  // Y-Momentum / per nucleon!!!!!!
-	        Double_t pz = 0.723/a;  // Z-Momentum / per nucleon!!!!!!
+	        Double_t pz = 0.842/a;  // Z-Momentum / per nucleon!!!!!!
 
   	        Double_t BExcEner = 0.0;
                 Double_t Bmass =  9.325577; //Mass in GeV

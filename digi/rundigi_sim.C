@@ -62,7 +62,7 @@ void rundigi_sim()
 
   // __ Init and run ___________________________________
   fRun -> Init();
-  fRun -> Run(0,1000000);
+  fRun -> Run(0,50000);
   //fRun -> RunOnTBData();
 
   std::cout << std::endl << std::endl;

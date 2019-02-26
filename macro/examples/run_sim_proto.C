@@ -1,4 +1,4 @@
-void run_sim_proto(Int_t nEvents = 100, TString mcEngine = "TGeant4")
+void run_sim_proto(Int_t nEvents = 100000, TString mcEngine = "TGeant4")
 {
 
   TString dir = getenv("VMCWORKDIR");
@@ -37,11 +37,11 @@ void run_sim_proto(Int_t nEvents = 100, TString mcEngine = "TGeant4")
   cave->SetGeometryFileName("cave.geo");
   run->AddModule(cave);
 
-  /*FairModule* magnet = new AtMagnet("Magnet");
-  run->AddModule(magnet);*/
+  FairModule* magnet = new AtMagnet("Magnet");
+  run->AddModule(magnet);
 
-  FairModule* pipe = new AtPipe("Pipe");
-  run->AddModule(pipe);
+  // FairModule* pipe = new AtPipe("Pipe");
+  // run->AddModule(pipe);
 
   FairDetector* ATTPC = new AtTpc("ATTPC_Proto", kTRUE);
   ATTPC->SetGeometryFileName("ATTPC_Proto_v1.0.root");
@@ -53,11 +53,11 @@ void run_sim_proto(Int_t nEvents = 100, TString mcEngine = "TGeant4")
 
     // -----   Magnetic field   -------------------------------------------
     // Constant Field
-   /* AtConstField  *fMagField = new AtConstField();
-    fMagField->SetField(0., 0. ,20. ); // values are in kG
+    AtConstField  *fMagField = new AtConstField();
+    fMagField->SetField(0., 0. ,0. ); // values are in kG
     fMagField->SetFieldRegion(-50, 50,-50, 50, -10,230); // values are in cm
                           //  (xmin,xmax,ymin,ymax,zmin,zmax)
-    run->SetField(fMagField);*/
+    run->SetField(fMagField);
     // --------------------------------------------------------------------
 
 
@@ -75,15 +75,15 @@ void run_sim_proto(Int_t nEvents = 100, TString mcEngine = "TGeant4")
 	          Int_t m = 1;   // Multiplicity  NOTE: Due the limitation of the TGenPhaseSpace accepting only pointers/arrays the maximum multiplicity has been set to 10 particles.
 	          Double_t px = 0.001/a;  // X-Momentum / per nucleon!!!!!!
 	          Double_t py = 0.001/a;  // Y-Momentum / per nucleon!!!!!!
-	          Double_t pz = 0.895/a;  // Z-Momentum / per nucleon!!!!!!
+	          Double_t pz = 0.842/a;  // Z-Momentum / per nucleon!!!!!!
   		  Double_t BExcEner = 0.0;
                   Double_t Bmass = 9.32755; //Mass in GeV
-                  Double_t NomEnergy = 35.0; //Nominal Energy of the beam: Only used for cross section calculation (Tracking energy is determined with momentum). Must be consistent with pz
+                  Double_t NomEnergy = 38.0; //Nominal Energy of the beam: Only used for cross section calculation (Tracking energy is determined with momentum). Must be consistent with pz
                   Double_t TargetMass = 3.72840;//Mass in GeV
 
 
 	          ATTPCIonGenerator* ionGen = new ATTPCIonGenerator("Ion",z,a,q,m,px,py,pz,BExcEner,Bmass,NomEnergy);
-	          ionGen->SetSpotRadius(1,-20,0);
+	          ionGen->SetSpotRadius(1,-100,0);
 	          // add the ion generator
 
 	          primGen->AddGenerator(ionGen);
@@ -120,7 +120,7 @@ void run_sim_proto(Int_t nEvents = 100, TString mcEngine = "TGeant4")
 		  Pxp.push_back(0.0);
 	          Pyp.push_back(0.0);
 		  Pzp.push_back(0.0);
-      ExE.push_back(1.797);
+      ExE.push_back(0.0);
                   Mass.push_back(5606.56); //In MeV
 
 		  // ---- Particle 2 -----
@@ -156,7 +156,7 @@ void run_sim_proto(Int_t nEvents = 100, TString mcEngine = "TGeant4")
 
   //---Store the visualiztion info of the tracks, this make the output file very large!!
   //--- Use it only to display but not for production!
-  run->SetStoreTraj(kTRUE);
+  //run->SetStoreTraj(kTRUE);
 
 
 

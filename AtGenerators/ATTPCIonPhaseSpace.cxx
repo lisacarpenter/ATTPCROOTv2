@@ -172,7 +172,7 @@ Bool_t ATTPCIonPhaseSpace::ReadEvent(FairPrimaryGenerator* primGen) {
    //gATVP->Test();
 
 
-//FairMCEventHeader* MCEventHeader = primGen->GetEvent();
+FairMCEventHeader* MCEventHeader = primGen->GetEvent();
    //std::cout<<" Event ID : "<<MCEventHeader->GetRunID()<<std::cout;
 
   // gMC->CurrentMedium();
@@ -268,7 +268,8 @@ Bool_t ATTPCIonPhaseSpace::ReadEvent(FairPrimaryGenerator* primGen) {
 
                fIsDecay=kTRUE;
                Bool_t allowed;
-               allowed = event1.SetDecay(fEnergyImpulsionLab_Total,fMult, mass_1,"Fermi");
+               allowed = event1.SetDecay(fEnergyImpulsionLab_Total,fMult, mass_1);
+               if(allowed)MCEventHeader->MarkSet(kTRUE);
                std::cout<<"does work?\t"<<allowed<<std::endl;
                Double_t weight1 = event1.Generate();
                std::cout<<"weight: "<<weight1<<std::endl;
@@ -293,7 +294,6 @@ Bool_t ATTPCIonPhaseSpace::ReadEvent(FairPrimaryGenerator* primGen) {
 
 
               }
-
               gATVP->SetRecoilE(KineticEnergy.at(0));
               gATVP->SetRecoilA(ThetaLab.at(0));
               gATVP->SetBURes1E(KineticEnergy.at(1));
